@@ -5,11 +5,98 @@
 \chapter{\IfLanguageName{dutch}{Methodologie}{Methodology}}
 \label{ch:methodologie}
 
-%% TODO: Hoe ben je te werk gegaan? Verdeel je onderzoek in grote fasen, en
-%% licht in elke fase toe welke stappen je gevolgd hebt. Verantwoord waarom je
-%% op deze manier te werk gegaan bent. Je moet kunnen aantonen dat je de best
-%% mogelijke manier toegepast hebt om een antwoord te vinden op de
-%% onderzoeksvraag.
+Het aanpakken van dit probleem heb ik gedaan als volgt: 
 
-\lipsum[21-25]
+1. ophalen van de data
+2. filtering van data
+3. voorbereiden data 
+4. analyseren data
+4. modellen trainen en test
+5. een applicatie maken
 
+\section{Ophalen data}
+
+\subsection{Data extrusion}
+
+De eerste stap was kijken waar de data best was van opgehaald. Voor dat we kijken waar we best onze data ophalen, is de betere vraag: Welke data hebben we nodig? 
+
+We willen een model trainen dat aan de hand van gespeelde partijen, toekomstige matches' uitkomst kan voorspellen. Met dat dit onderzoek ook gaat enkel over grootmeesters, hebben enkel partijen nodig die gespeeld werden tussen twee grootmeesters. Daarnaast is ook belangrijk te weten wie de twee spelers waren, welke rating die hadden op dat moment en met welke kleur ze elk speelden.
+
+Er zijn een aantal databases die alle partijen hebben die onze criterea voldoen. Websites en applicaties zoals chessbase, chess.com, lichess, en nog vele andere hebben de meeste data die nodig is voor dit onderzoek. Echter zal ik gebruik maken van de data dat de officiele FIDE website heeft proberen te bemachtigen. Met dat FIDE de hoofdcoordinator is van professioneel schaken, leek mij dit de beste aanpak om mijn data van te halen. Alsook zag ik dat de fide search engine kon filteren op grootmeesters, actieve spelers en op partijlengte. De mogelijkheid om op al deze dingen te filteren had mij overtuigd om hiermee aan de slag te gaan. 
+
+Er waren drie mogelijkheden om hiermee aan de slag te gaan:
+
+\begin{itemize}
+    \item Een python parser gebruiken dat ontwikkeld is door een internationale FIDE scheidsrechter \autocite{Larreategi}
+    \item Een webscraper van \textcite{Alves2020}'s GitHub (Software ingenieur)
+    \item Het schrijven van een eigen API en scraper
+\end{itemize}
+
+De bedoeling was om na te kijken of ik één van de twee eerste opties kon doen voordat ik keek om zelf een API te schrijven. Dus ik ging aan de slag beginnend met de python scraper van Mikel Larreategi en vond al snel een probleem. De scraper was bedoeld om enkel tournamentpartijen op te halen. Niet enkel dat, maar de informatie dat deze scraper ophaalde was niet zo bruikbaar. Cruciale data van spelers zoals hun ELO-rating miste en overbodige data zoals welke scheidsrechter er elke partij overzichtigde. Dit leek al snel een dood pad.
+
+De tweede optie leek op het eerste zicht niet zo interessant met dat de API al een tijd geleden geschreven was en sindsdien niet meer geupdate was en die dus misschien niet meer up to date was. Daarnaast was alles ook in javascript geschreven en was er ook geen ingebouwde python scraper die met de API kon werken. Na verder inzien had de github repository een kleine scraper dat de profiel data kon ophalen van gelijk welke speler dat geregistreerd stond op de fide website als je de speler ID kende. De speler ID is niet gebaseerd op de spelers rating of ranking maar eerder op wanneer de speler is toegevoegd aan de databank of willekeurig. 
+
+Een grote bonus dat deze repository had, is dat het een MIT licentie heeft dat luidt: ''Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.''. De conditie in ruil voor het gebruikmaken van de ''software'', is dat de bovenstaande auteursrechtvermelding en deze toestemmingsverklaring dienen te worden opgenomen in alle kopieën of substantiële delen van de Software. 
+
+\subsection{Plan van aanpak}
+
+De scraper die de GitHub repository heeft, kan de profieldata ophalen van elke speler naar keuze. Echter het probleem is, is dat we hiervoor elke speler hun ID nodig hebben om die te kunnen hebben. Nadat dit gebeurd is, hebben we enkel de profieldata van de spelers, echter zijn wij eerder geïnteresseerd in de partijhistoriek van elke speler. Deze historiek bevat alle gespeelde partijen van iemand in zijn of haar carriere. 
+
+Dit is de data dat we naar op zoek zijn. Als we ervoor kunnen zorgen dat we de historiek van elke speler kunnen ophalen, dan hebben we al onze data bemachtigd.
+
+\subsection{Spelerdata}
+
+De API is in javascript geschreven en ookal heb ik ervaring met die taal, is het niet mijn expertise om een scraper ook in die taal te schrijven. Ik ben eerder gewend om dit in Python te doen dus keek ik hoe ik dit moest aanpakken. 
+
+Het idee is om de scraper in python te schrijven, aan de hand van beautifulsoup4. Beautifulsoup is a python library for extracting data from a website directly to UTF-8.\autocite{Richardson}
+
+\begin{lstlisting}[language=Python]
+    import re
+    import requests
+    from bs4 import BeautifulSoup
+    
+    # get fide ids
+    print("Getting fide ids")
+    fide_ids_url = f"https://ratings.fide.com/incl_search_l.php?search=&search_rating={rating}&search_country=all&search_title={title}&search_other_title=all&search_year=undefined&search_low=0&search_high=3500&search_inactive=on&search_exrated=off&search_radio=rating&search_bday_start=all&search_bday_end=all&search_radio=rating&search_asc=descending&search_gender=undefined&simple=0"
+    fide_ids_html = requests.get(fide_ids_url, headers={'X-Requested-With': 'XMLHttpRequest'}).text
+    soup = BeautifulSoup(fide_ids_html, 'html.parser')
+    anchors = soup.find_all('a')
+    hrefs = [a.get('href') for a in anchors]
+    pattern = re.compile(r"/profile/(\d+)")
+    fide_ids = [pattern.search(href).group(1) for href in hrefs if pattern.search(href)]
+\end{lstlisting}
+
+Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beautifulsoup. Het starten van dit script zorgt ervoor dat een applicatie opstart dat vraagt aan de gebruiker om te kiezen uit standaard, rapid of blitz (de drie tijdsmodules). Nadat deze keuze is gemaakt, vraagt het programma ook welke filter je wilt kiezen. Dit is filter dat een lijst geeft met alle mogelijke titels waaronder de titel grootmeesteer. De data die je kan ophalen is dus flexibel maar voor onze doeleinden, zullen we enkel die van de grootmeesters ophalen. Dit zorgt ervoor dat we alle ID's hebben van alle actieve grootmeesters. 
+
+\begin{lstlisting}[language=Python]
+    import re
+    import subprocess
+    import pandas as pd
+    from tqdm import tqdm
+    
+    # get info of players
+    print("Getting info of players")
+    
+    players = []
+    process = subprocess.Popen("fide-ratings-scraper api", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    for i in tqdm(range(len(fide_ids))):
+        fide_id = fide_ids[i]
+        response = requests.get(f"http://localhost:3000/player/{fide_id}/info")
+        player = response.json()
+        player["fide_id"] = fide_id
+        player["name"] = player["name"].strip()
+        players.append(player)
+    process.kill()
+    
+    # print out data to csv
+    df = pd.DataFrame(players)
+    df.to_csv(f"fide_players_{rating}_{title}.csv", index=False)
+\end{lstlisting}
+
+De volgende stap is nu om die lijst aan ID's te loopen doorheen de ingebouwde API en scraper van de repository en onze data in een csv bestand op te slaan. Gebruikmakend van de ingebouwde ''fide-ratings-scraper api'', gaan we door onze lijst fide id's en halen we de data op van elke speler. Deze wordt in een json formaat omgevormd en toegevoegd in een csv in vorm van een dataframe met behulp van de python library pandas. Pandas is een python library waarbij de gebruiker data op verschillende manieren kan manipuleren en analyseren.\autocite{NumFocus}
+
+\subsection{Historiek}
+
+De tussenstap om spelerdata op te halen lijkt zinloos op eerste zicht met dat je gebruik maakt van een ID om iemand zijn profielgegevens op te laden, kan je dan ook zijn historiek ophalen. Echter het probleem hiermee is, is dat we enkel matches willen ophalen waarbij grootmeesters tegen grootmeesters spelen en de html van de website houdt de id van de spelers niet bij in de historiek, enkel de naam. Daarom hebben we nu een csv met alle namen van alle grootmeesters zodat we nu alle namen in de lijst kunnen afgaan en checken of de tegenstander ook in die lijst staat. 
+
+-- code
