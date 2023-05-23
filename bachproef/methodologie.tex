@@ -5,50 +5,54 @@
 \chapter{\IfLanguageName{dutch}{Methodologie}{Methodology}}
 \label{ch:methodologie}
 
-Het aanpakken van dit probleem heb ik gedaan als volgt: 
+\section{Plan van aanpak}
 
-1. ophalen van de data
-2. filtering van data
-3. voorbereiden data 
-4. analyseren data
-4. modellen trainen en test
-5. een applicatie maken
+
+De meest effectieve benadering voor het uitvoeren van dit onderzoek omvat een reeks stappen. Allereerst wordt de data-acquisitie uitgevoerd om relevante gegevens te verzamelen. Het is van essentieel belang om te bepalen waar de meest geschikte bronnen zijn om de benodigde data te verkrijgen en welke methoden kunnen worden toegepast.
+
+Na het succesvol verzamelen van de data, volgt het proces van datafiltering, waarbij onnodige rijen en kolommen worden verwijderd en de aanwezigheid van bruikbare informatie wordt geëvalueerd.
+
+Zodra alle vereiste data beschikbaar is, wordt de data voorbereid voor het gedeelte van machinaal leren met behulp van geschikte Python-bibliotheken. Daarnaast wordt er een analyse uitgevoerd op de data om mogelijk interessante bevindingen en conclusies te identificeren.
+
+Vervolgens wordt het best mogelijke AI-model getraind. Verschillende modellen zullen worden geëvalueerd en getest om het meest optimale model te identificeren. Dit model zal verder worden verfijnd om een nauwkeurigheidsscore van 95% te behalen.
+
+Ten slotte zal er een kleine applicatie worden ontwikkeld waarin gebruikers de mogelijkheid krijgen om, op basis van het getrainde model, voorspellingen te doen over schaakpartijen tussen twee grootmeesters.
+
+Door deze methodische aanpak kan het onderzoek gestructureerd worden uitgevoerd, waarbij de focus ligt op het verkrijgen van betrouwbare data, het analyseren ervan, het trainen van een nauwkeurig AI-model en het ontwikkelen van een gebruiksvriendelijke applicatie.
 
 \section{Ophalen data}
 
 \subsection{Data extrusion}
 
-De eerste stap was kijken waar de data best was van opgehaald. Voor dat we kijken waar we best onze data ophalen, is de betere vraag: Welke data hebben we nodig? 
+In het kader van deze bachelorproef werd als eerste stap gekeken naar de meest geschikte bron voor het verkrijgen van de benodigde data. Voordat bepaald wordt waar de data kan verkrijgbaar is, is het essentieel om de vraag te stellen: Welke specifieke data is nodig?
 
-We willen een model trainen dat aan de hand van gespeelde partijen, toekomstige matches' uitkomst kan voorspellen. Met dat dit onderzoek ook gaat enkel over grootmeesters, hebben enkel partijen nodig die gespeeld werden tussen twee grootmeesters. Daarnaast is ook belangrijk te weten wie de twee spelers waren, welke rating die hadden op dat moment en met welke kleur ze elk speelden.
+Het doel van dit onderzoek is om een model te trainen dat de uitkomst van toekomstige schaakpartijen kan voorspellen op basis van gespeelde partijen. Aangezien het onderzoek zich uitsluitend richt op grootmeesters, zijn alleen partijen nodig die gespeeld zijn tussen twee grootmeesters. Bovendien is het belangrijk om te weten welke spelers bij welke partij betrokken waren, welke rating ze op dat moment hadden en met welke kleur ze elk speelden.
 
-Er zijn een aantal databases die alle partijen hebben die onze criterea voldoen. Websites en applicaties zoals chessbase, chess.com, lichess, en nog vele andere hebben de meeste data die nodig is voor dit onderzoek. Echter zal ik gebruik maken van de data dat de officiele FIDE website heeft proberen te bemachtigen. Met dat FIDE de hoofdcoordinator is van professioneel schaken, leek mij dit de beste aanpak om mijn data van te halen. Alsook zag ik dat de fide search engine kon filteren op grootmeesters, actieve spelers en op partijlengte. De mogelijkheid om op al deze dingen te filteren had mij overtuigd om hiermee aan de slag te gaan. 
+Er zijn verschillende databases die partijen bevatten die aan de gestelde criteria voldoen. Websites en applicaties zoals ChessBase, Chess.com, Lichess en vele anderen bieden de meeste benodigde data voor dit onderzoek. De keuze is echter gevallen op het verkrijgen van data van de officiële FIDE-website, omdat FIDE de belangrijkste coördinator is van professioneel schaken. Bovendien bleek uit de functionaliteit van de FIDE-zoekmachine dat deze kan filteren op grootmeesters, actieve spelers en partijlengte. Deze veelzijdige filteringsopties waren overtuigend genoeg om deze bron te verkiezen.
 
-Er waren drie mogelijkheden om hiermee aan de slag te gaan:
-
+Voor het verkrijgen van de data waren er drie mogelijke benaderingen:
 \begin{itemize}
-    \item Een python parser gebruiken dat ontwikkeld is door een internationale FIDE scheidsrechter \autocite{Larreategi}
-    \item Een webscraper van \textcite{Alves2020}'s GitHub (Software ingenieur)
-    \item Het schrijven van een eigen API en scraper
+    \item Het gebruik van een door een internationale FIDE-scheidsrechter ontwikkelde Python-parser \autocite{Larreategi}
+    \item Een webscraper van de GitHub-repository van \textcite{Alves2020}
+    \item Het ontwikkelen van een eigen API en scraper.
 \end{itemize}
+Het oorspronkelijke plan was om eerst te onderzoeken of één van de eerste twee opties haalbaar was voordat werd overwogen om zelf een API te ontwikkelen. Er is gestart met het verkennen van de Python-scraper van Mikel Larreategi. Al snel werd echter een probleem ontdekt. De scraper was oorspronkelijk bedoeld om alleen toernooipartijen op te halen. Daarnaast was de verzamelde informatie niet bruikbaar voor het beoogde doel. Belangrijke spelersgegevens, zoals hun ELO-rating, ontbraken, terwijl overbodige informatie, zoals de betrokken scheidsrechters bij elke partij, wel aanwezig was. Het werd al snel duidelijk dat deze benadering niet geschikt was om te volgen.
 
-De bedoeling was om na te kijken of ik één van de twee eerste opties kon doen voordat ik keek om zelf een API te schrijven. Dus ik ging aan de slag beginnend met de python scraper van Mikel Larreategi en vond al snel een probleem. De scraper was bedoeld om enkel tournamentpartijen op te halen. Niet enkel dat, maar de informatie dat deze scraper ophaalde was niet zo bruikbaar. Cruciale data van spelers zoals hun ELO-rating miste en overbodige data zoals welke scheidsrechter er elke partij overzichtigde. Dit leek al snel een dood pad.
+Op het eerste gezicht leek de tweede optie niet erg veelbelovend, aangezien de API al geruime tijd geleden was ontwikkeld en mogelijk niet meer up-to-date was. Bovendien was de volledige implementatie in JavaScript en was er geen ingebouwde Python-scraper die met de API kon werken. Nader onderzoek onthulde echter een kleine scraper in de GitHub-repository die profielgegevens kon ophalen van elke geregistreerde speler op de FIDE-website, mits de speler-ID bekend was. De speler-ID is niet gebaseerd op de rating of ranglijst van de speler, maar eerder op het tijdstip van toevoeging aan de database of een willekeurige toewijzing.
 
-De tweede optie leek op het eerste zicht niet zo interessant met dat de API al een tijd geleden geschreven was en sindsdien niet meer geupdate was en die dus misschien niet meer up to date was. Daarnaast was alles ook in javascript geschreven en was er ook geen ingebouwde python scraper die met de API kon werken. Na verder inzien had de github repository een kleine scraper dat de profiel data kon ophalen van gelijk welke speler dat geregistreerd stond op de fide website als je de speler ID kende. De speler ID is niet gebaseerd op de spelers rating of ranking maar eerder op wanneer de speler is toegevoegd aan de databank of willekeurig. 
+Een belangrijk voordeel van deze repository is de MIT-licentie die eraan verbonden is. Deze licentie luidt als volgt: "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so." Het enige vereiste voor het gebruik van de software is het opnemen van de bovenstaande auteursrechtvermelding en toestemmingsverklaring in alle kopieën of substantiële delen van de software.
 
-Een grote bonus dat deze repository had, is dat het een MIT licentie heeft dat luidt: ''Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.''. De conditie in ruil voor het gebruikmaken van de ''software'', is dat de bovenstaande auteursrechtvermelding en deze toestemmingsverklaring dienen te worden opgenomen in alle kopieën of substantiële delen van de Software. 
+\subsection{Doelstelling}
 
-\subsection{Plan van aanpak}
+De beschikbare scraper in de GitHub-repository biedt de mogelijkheid om de profielgegevens van individuele spelers op te halen. Niettemin is het vereiste van de spelers-ID voor elke individuele speler een beperkende factor. Zodra deze informatie wordt verkregen, hebben we echter alleen toegang tot de profielgegevens van de spelers, terwijl onze interesse voornamelijk uitgaat naar de volledige partijgeschiedenis van elke speler. Deze partijgeschiedenis omvat alle gespeelde partijen gedurende de gehele carrière van de betreffende spelers.
 
-De scraper die de GitHub repository heeft, kan de profieldata ophalen van elke speler naar keuze. Echter het probleem is, is dat we hiervoor elke speler hun ID nodig hebben om die te kunnen hebben. Nadat dit gebeurd is, hebben we enkel de profieldata van de spelers, echter zijn wij eerder geïnteresseerd in de partijhistoriek van elke speler. Deze historiek bevat alle gespeelde partijen van iemand in zijn of haar carriere. 
-
-Dit is de data dat we naar op zoek zijn. Als we ervoor kunnen zorgen dat we de historiek van elke speler kunnen ophalen, dan hebben we al onze data bemachtigd.
+Deze partijgeschiedenis vormt de gewenste dataset waar we naar op zoek zijn. Het verkrijgen van de volledige partijgeschiedenis voor elke individuele speler zou ons in staat stellen om alle benodigde gegevens te verwerven voor ons onderzoek.
 
 \subsection{Spelerdata}
 
-De API is in javascript geschreven en ookal heb ik ervaring met die taal, is het niet mijn expertise om een scraper ook in die taal te schrijven. Ik ben eerder gewend om dit in Python te doen dus keek ik hoe ik dit moest aanpakken. 
+De API is geïmplementeerd in JavaScript, maar gezien mijn ervaring met die taal, ligt mijn expertise niet bij het ontwikkelen van een scraper in JavaScript. Mijn voorkeur gaat eerder uit naar het gebruik van Python voor dit doeleinde, aangezien ik vertrouwd ben met het schrijven van scrapers in deze programmeertaal.
 
-Het idee is om de scraper in python te schrijven, aan de hand van beautifulsoup4. Beautifulsoup is a python library for extracting data from a website directly to UTF-8.\autocite{Richardson}
+Het plan is dan ook om de scraper te implementeren in Python, met behulp van de bibliotheek Beautiful Soup 4. Beautiful Soup is een Python-bibliotheek waarmee gegevens rechtstreeks in het UTF-8-formaat kunnen worden geëxtraheerd van een website. Deze keuze biedt mij de mogelijkheid om gebruik te maken van de functionaliteiten en flexibiliteit die Python biedt bij het ontwikkelen van de scraper.\autocite{Richardson}
 
 \begin{lstlisting}[language=Python]
     import re
@@ -93,10 +97,33 @@ Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beaut
     df.to_csv(f"fide_players_{rating}_{title}.csv", index=False)
 \end{lstlisting}
 
-De volgende stap is nu om die lijst aan ID's te loopen doorheen de ingebouwde API en scraper van de repository en onze data in een csv bestand op te slaan. Gebruikmakend van de ingebouwde ''fide-ratings-scraper api'', gaan we door onze lijst fide id's en halen we de data op van elke speler. Deze wordt in een json formaat omgevormd en toegevoegd in een csv in vorm van een dataframe met behulp van de python library pandas. Pandas is een python library waarbij de gebruiker data op verschillende manieren kan manipuleren en analyseren.\autocite{NumFocus}
+In dit proces worden met behulp van Beautiful Soup alle ID's van geselecteerde profielen opgehaald. Bij het starten van dit script wordt een applicatie geïnitialiseerd, waarin de gebruiker wordt gevraagd om een keuze te maken uit de standaard-, rapid- of blitzmodus (de drie beschikbare tijdsmodules). Nadat deze keuze is gemaakt, wordt de gebruiker ook gevraagd welk filter hij of zij wenst toe te passen.
+
+Dit filter stelt een lijst samen met alle mogelijke titels, waaronder de titel "grootmeester". Het is belangrijk op te merken dat de op te halen data flexibel is, maar voor onze specifieke doeleinden zullen we ons beperken tot het verkrijgen van de ID's van actieve grootmeesters. Hierdoor beschikken we over alle ID's van de huidige grootmeesters, wat cruciaal is voor ons onderzoek.\autocite{NumFocus}
 
 \subsection{Historiek}
 
-De tussenstap om spelerdata op te halen lijkt zinloos op eerste zicht met dat je gebruik maakt van een ID om iemand zijn profielgegevens op te laden, kan je dan ook zijn historiek ophalen. Echter het probleem hiermee is, is dat we enkel matches willen ophalen waarbij grootmeesters tegen grootmeesters spelen en de html van de website houdt de id van de spelers niet bij in de historiek, enkel de naam. Daarom hebben we nu een csv met alle namen van alle grootmeesters zodat we nu alle namen in de lijst kunnen afgaan en checken of de tegenstander ook in die lijst staat. 
+Op het eerste gezicht lijkt de tussenstap voor het ophalen van spelergegevens misschien overbodig, aangezien we gebruik maken van een ID om profielinformatie op te halen. Is het echter mogelijk om ook de partijgeschiedenis op te halen? Zeker, maar hier doet zich een probleem voor: in de partijgeschiedenis van een speler wordt alleen de naam van de tegenstander vermeld, niet de bijbehorende ID. Het was essentieel om de ID's van elke speler aan een specifieke naam te koppelen, zodat we kunnen controleren of de tegenstander op de lijst van grootmeesters staat. De code is zo ontworpen dat deze schaalbaar is voor het geval iemand alle wedstrijden van een groep spelers wil ophalen zonder dat er een filter wordt toegepast op een reeds bestaand CSV-bestand.
 
--- code
+\begin{lstlisting}[language=Python]
+    import re
+    import pandas as pd
+    
+    #get games of player
+    player_games = []
+
+    def output_player_games(player_games):
+        df = pd.DataFrame(player_games)
+        match = re.search(r'fide_players_(.+)_([^\.]+)\.csv', players_file_name)
+        if not opponents_from_csv:
+            df.to_csv(f"fide_games_{match.group(1)}_{match.group(2)}_all.csv", index=False)
+        else:
+            df.to_csv(f"fide_games_{match.group(1)}_{match.group(2)}_oppfromcsv.csv", index=False)
+\end{lstlisting}
+
+Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er al dan niet moet worden gefilterd op naam. Indien de eindgebruiker ervoor kiest om geen filtering toe te passen tijdens het scrapproces, zal het programma de if-statement doorlopen. Daarentegen, indien de eindgebruiker wel filtering wenst, zal de scraper de else-statement volgen. Deze aanpak stelt ons in staat om meerdere CSV-bestanden te genereren voor verschillende doeleinden. Voor dit specifieke project heb ik ervoor gekozen om te filteren op naam. Dit besluit is genomen omdat we alleen geïnteresseerd zijn in partijen waarbij een grootmeester tegen een andere grootmeester speelt.
+
+\section{Filtering data}
+
+
+
