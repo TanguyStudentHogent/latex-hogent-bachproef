@@ -14,7 +14,7 @@ Na het succesvol verzamelen van de data, volgt het proces van datafiltering, waa
 
 Zodra alle vereiste data beschikbaar is, wordt de data voorbereid voor het gedeelte van machinaal leren met behulp van geschikte Python-bibliotheken. Daarnaast wordt er een analyse uitgevoerd op de data om mogelijk interessante bevindingen en conclusies te identificeren.
 
-Vervolgens wordt het best mogelijke AI-model getraind. Verschillende modellen zullen worden geëvalueerd en getest om het meest optimale model te identificeren. Dit model zal verder worden verfijnd om een nauwkeurigheidsscore van 95% te behalen.
+Vervolgens wordt het best mogelijke AI-model getraind. Verschillende modellen zullen worden geëvalueerd en getest om het meest optimale model te identificeren. Dit model zal verder worden verfijnd om een nauwkeurigheidsscore van 95\% te behalen.
 
 Ten slotte zal er een kleine applicatie worden ontwikkeld waarin gebruikers de mogelijkheid krijgen om, op basis van het getrainde model, voorspellingen te doen over schaakpartijen tussen twee grootmeesters.
 
@@ -44,9 +44,9 @@ Een belangrijk voordeel van deze repository is de MIT-licentie die eraan verbond
 
 \subsection{Doelstelling}
 
-De beschikbare scraper in de GitHub-repository biedt de mogelijkheid om de profielgegevens van individuele spelers op te halen. Niettemin is het vereiste van de spelers-ID voor elke individuele speler een beperkende factor. Zodra deze informatie wordt verkregen, hebben we echter alleen toegang tot de profielgegevens van de spelers, terwijl onze interesse voornamelijk uitgaat naar de volledige partijgeschiedenis van elke speler. Deze partijgeschiedenis omvat alle gespeelde partijen gedurende de gehele carrière van de betreffende spelers.
+De beschikbare scraper in de GitHub-repository biedt de mogelijkheid om de profielgegevens van individuele spelers op te halen. Zodra deze informatie wordt verkregen, is er echter alleen toegang tot de profielgegevens van de spelers, terwijl onze interesse voornamelijk uitgaat naar de volledige partijgeschiedenis van elke speler. Deze partijgeschiedenis omvat alle gespeelde partijen gedurende de gehele carrière van de betreffende spelers.
 
-Deze partijgeschiedenis vormt de gewenste dataset waar we naar op zoek zijn. Het verkrijgen van de volledige partijgeschiedenis voor elke individuele speler zou ons in staat stellen om alle benodigde gegevens te verwerven voor ons onderzoek.
+Deze partijgeschiedenis vormt de basis voor de gewenste dataset. Het verkrijgen van de volledige partijgeschiedenis voor elke individuele speler zou ons in staat stellen om alle benodigde gegevens te verwerven voor ons onderzoek.
 
 \subsection{Spelerdata}
 
@@ -70,7 +70,7 @@ Het plan is dan ook om de scraper te implementeren in Python, met behulp van de 
     fide_ids = [pattern.search(href).group(1) for href in hrefs if pattern.search(href)]
 \end{lstlisting}
 
-Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beautifulsoup. Het starten van dit script zorgt ervoor dat een applicatie opstart dat vraagt aan de gebruiker om te kiezen uit standaard, rapid of blitz (de drie tijdsmodules). Nadat deze keuze is gemaakt, vraagt het programma ook welke filter je wilt kiezen. Dit is filter dat een lijst geeft met alle mogelijke titels waaronder de titel grootmeesteer. De data die je kan ophalen is dus flexibel maar voor onze doeleinden, zullen we enkel die van de grootmeesters ophalen. Dit zorgt ervoor dat we alle ID's hebben van alle actieve grootmeesters. 
+Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beautifulsoup. Het starten van dit script zorgt ervoor dat een applicatie opstart dat vraagt aan de gebruiker om te kiezen uit standaard, rapid of blitz (de drie tijdsmodules). Nadat deze keuze is gemaakt, vraagt het programma ook welke filter je wilt kiezen. Dit is filter dat een lijst geeft met alle mogelijke titels waaronder de titel grootmeesteer. De data die je kan ophalen is dus flexibel maar voor dit project's doeleinden, worden enkel de partijen van de grootmeesters opgehaald. Zo zijn alle ID's van alle actieve grootmeesters bemachtigd.
 
 \begin{lstlisting}[language=Python]
     import re
@@ -99,11 +99,11 @@ Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beaut
 
 In dit proces worden met behulp van Beautiful Soup alle ID's van geselecteerde profielen opgehaald. Bij het starten van dit script wordt een applicatie geïnitialiseerd, waarin de gebruiker wordt gevraagd om een keuze te maken uit de standaard-, rapid- of blitzmodus (de drie beschikbare tijdsmodules). Nadat deze keuze is gemaakt, wordt de gebruiker ook gevraagd welk filter hij of zij wenst toe te passen.
 
-Dit filter stelt een lijst samen met alle mogelijke titels, waaronder de titel "grootmeester". Het is belangrijk op te merken dat de op te halen data flexibel is, maar voor onze specifieke doeleinden zullen we ons beperken tot het verkrijgen van de ID's van actieve grootmeesters. Hierdoor beschikken we over alle ID's van de huidige grootmeesters, wat cruciaal is voor ons onderzoek.\autocite{NumFocus}
+Deze filter stelt een lijst samen met alle mogelijke titels, waaronder de titel "grootmeester". Het is belangrijk op te merken dat de op te halen data flexibel is. Voor de specifieke doeleinden van dit onderzoek wordt de focus gelegd op het verkrijgen van de ID's van actieve grootmeesters. Hierdoor worden alle ID's van de huidige grootmeesters verzameld, wat van cruciaal belang is voor het onderzoek.\autocite{NumFocus}
 
 \subsection{Historiek}
 
-Op het eerste gezicht lijkt de tussenstap voor het ophalen van spelergegevens misschien overbodig, aangezien we gebruik maken van een ID om profielinformatie op te halen. Is het echter mogelijk om ook de partijgeschiedenis op te halen? Zeker, maar hier doet zich een probleem voor: in de partijgeschiedenis van een speler wordt alleen de naam van de tegenstander vermeld, niet de bijbehorende ID. Het was essentieel om de ID's van elke speler aan een specifieke naam te koppelen, zodat we kunnen controleren of de tegenstander op de lijst van grootmeesters staat. De code is zo ontworpen dat deze schaalbaar is voor het geval iemand alle wedstrijden van een groep spelers wil ophalen zonder dat er een filter wordt toegepast op een reeds bestaand CSV-bestand.
+Op het eerste gezicht lijkt de tussenstap voor het ophalen van spelergegevens misschien overbodig, aangezien er gebruik gemaakt wordt van een ID om profielinformatie op te halen. Is het echter mogelijk om ook de partijgeschiedenis op te halen? Zeker, maar hier doet zich een probleem voor: in de partijgeschiedenis van een speler wordt alleen de naam van de tegenstander vermeld, niet de bijbehorende ID. Het was essentieel om de ID's van elke speler aan een specifieke naam te koppelen, zodat er kan gecontroleerd wordt of de tegenstander op de lijst van grootmeesters staat. De code is zo ontworpen dat deze schaalbaar is voor het geval iemand alle wedstrijden van een groep spelers wil ophalen zonder dat er een filter wordt toegepast op een reeds bestaand CSV-bestand.
 
 \begin{lstlisting}[language=Python]
     import re
@@ -121,9 +121,8 @@ Op het eerste gezicht lijkt de tussenstap voor het ophalen van spelergegevens mi
             df.to_csv(f"fide_games_{match.group(1)}_{match.group(2)}_oppfromcsv.csv", index=False)
 \end{lstlisting}
 
-Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er al dan niet moet worden gefilterd op naam. Indien de eindgebruiker ervoor kiest om geen filtering toe te passen tijdens het scrapproces, zal het programma de if-statement doorlopen. Daarentegen, indien de eindgebruiker wel filtering wenst, zal de scraper de else-statement volgen. Deze aanpak stelt ons in staat om meerdere CSV-bestanden te genereren voor verschillende doeleinden. Voor dit specifieke project heb ik ervoor gekozen om te filteren op naam. Dit besluit is genomen omdat we alleen geïnteresseerd zijn in partijen waarbij een grootmeester tegen een andere grootmeester speelt.
+Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er al dan niet moet worden gefilterd op naam. Indien de eindgebruiker ervoor kiest om geen filtering toe te passen tijdens het scrapproces, zal het programma de if-statement doorlopen. Daarentegen, indien de eindgebruiker wel filtering wenst, zal de scraper de else-statement volgen. Deze aanpak stelt ons in staat om meerdere CSV-bestanden te genereren voor verschillende doeleinden. Voor dit specifieke project, is er ervoor gekozen om te filteren op de naam. Dit besluit is genomen omdat er enkel interesse is in partijen waarbij een grootmeester tegen een andere grootmeester speelt.
 
 \section{Filtering data}
 
-
-
+De csv-bestanden
