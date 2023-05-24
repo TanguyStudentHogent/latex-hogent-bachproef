@@ -1,4 +1,4 @@
-\chapter{\IfLanguageName{dutch}{Stand van zaken}{State of the art}}
+\chapter{\IfLanguageName{dutch}{Stand van zaken}{State of the art}}%
 \label{ch:stand-van-zaken}
 
 % Tip: Begin elk hoofdstuk met een paragraaf inleiding die beschrijft hoe
@@ -7,11 +7,48 @@
 
 % Pas na deze inleidende paragraaf komt de eerste sectiehoofding.
 
-Dit hoofdstuk bevat je literatuurstudie. De inhoud gaat verder op de inleiding, maar zal het onderwerp van de bachelorproef *diepgaand* uitspitten. De bedoeling is dat de lezer na lezing van dit hoofdstuk helemaal op de hoogte is van de huidige stand van zaken (state-of-the-art) in het onderzoeksdomein. Iemand die niet vertrouwd is met het onderwerp, weet nu voldoende om de rest van het verhaal te kunnen volgen, zonder dat die er nog andere informatie moet over opzoeken \autocite{Pollefliet2011}.
+\section{inleiding}
 
-Je verwijst bij elke bewering die je doet, vakterm die je introduceert, enz. naar je bronnen. In \LaTeX{} kan dat met het commando \texttt{$\backslash${textcite\{\}}} of \texttt{$\backslash${autocite\{\}}}. Als argument van het commando geef je de ``sleutel'' van een ``record'' in een bibliografische databank in het Bib\LaTeX{}-formaat (een tekstbestand). Als je expliciet naar de auteur verwijst in de zin, gebruik je \texttt{$\backslash${}textcite\{\}}.
-Soms wil je de auteur niet expliciet vernoemen, dan gebruik je \texttt{$\backslash${}autocite\{\}}. In de volgende paragraaf een voorbeeld van elk.
+Het voorspellen van professionele schaakmatches is een uitdagende taak. We bespreken de database die we gebruiken om de informatie van grootmeesters hun spellen op te halen, het gebruik van numpy libraries om voorspellingen te doen met deze data, waarom wit meer spellen wint dan zwart en het vergelijken van het glicko systeem met het ELO-systeem om spelers een rating te geven.
 
-\textcite{Knuth1998} schreef e  en van de standaardwerken over sorteer- en zoekalgoritmen. Experten zijn het erover eens dat cloud computing een interessante opportuniteit vormen, zowel voor gebruikers als voor dienstverleners op vlak van informatietechnologie~\autocite{Creeger2009}.
+\section{database}
 
-\lipsum[7-20]
+Om een voorspelling te doen over professionele schaakmatches is het essentieel om data te verzamelen over eerdere schaakmatches. De database die we gebruiken om informatie van grootmeesters hun spellen op te halen is de FIDE Rating Database. Deze database bevat informatie over de ratings in alle categoriën waar het onderzoek over zal gevoerd worden. Ook komen deze kan deze database in een XML als txt formaat gedownload worden. Het bevat gedetailleerde informatie over de schaakmatches die deze spelers hebben gespeeld, waaronder de datum, locatie en uitkomst van de match. Door gebruik te maken van deze database kunnen we een groot aantal schaakmatches analyseren en voorspellingen doen over toekomstige matches. 
+
+\section{Numpy Libraries}
+
+Om voorspellingen te doen met de informatie uit de FIDE Rating Database, maken we gebruik van de numpy libraries. Deze libraries zijn een essentieel onderdeel van Python en worden gebruikt voor wetenschappelijke berekeningen. Met de numpy libraries kunnen we de data uit de database omzetten in numerieke gegevens die gebruikt kunnen worden voor het trainen van machine learning modellen. We kunnen bijvoorbeeld gebruikmaken van een decision tree algoritme om voorspellingen te doen over de uitkomst van schaakmatches.
+
+\section{kleurbelangstelling}
+
+Het is een bekend feit dat wit meer schaakmatches wint dan zwart. Een van de redenen hiervoor is het voordeel van de eerste zet. Omdat wit als eerste een zet mag doen, kan deze speler de strategie bepalen en het spel in een bepaalde richting sturen. Ook kan wit de controle krijgen over belangrijke velden op het bord. Bovendien zijn er enkele openingen die meer geschikt zijn voor wit dan voor zwart, waardoor wit een voordeel heeft in het begin van het spel. Daarnaast zullen we aan de hand van de data, dat door de fide database gegeven is geweest, aantonen dat er meer schaakmatches gewonnen worden door wit dan zwart. Ook zullen we redeneringen en papers aanhalen die de visie van anderen aanhalen waarom dit zo is.
+
+\section{Glicko}
+
+Om spelers een rating te geven, zijn er verschillende systemen beschikbaar, waaronder het ELO-systeem en het Glicko-systeem. Het ELO-systeem is het meest gebruikte systeem voor het beoordelen van schaakspelers. Het systeem is ontworpen door Arpad Elo en berekent de rating van een speler op basis van hun prestaties in eerdere schaakmatches. Het Glicko-systeem is een alternatief voor het ELO-systeem en is ontworpen door Mark Glickman. Het systeem houdt ook rekening met een gemiddelde sterkte van de de spelers in huidige staat.
+
+%\section{bronnen}
+%The database used for retrieving chess games played by grandmasters is the MillionBase 2.2 database, which can be found at http://www.top-5000.nl/pgn.htm.
+
+%The use of NumPy libraries for making predictions with the retrieved data is based on the work of Matthew Lai, whose code can be found at https://github.com/mjlai/chess-rating-predictor.
+
+%The explanation for why White wins more games than Black is based on statistical analysis of large numbers of chess games, and is supported by numerous sources, including:
+
+%Houdini Chess Engine Analysis: http://www.cruxis.com/chess/houdini.htm
+%Chessgames.com statistics: https://www.chessgames.com/perl/chessstatistics?statcmp=All&opening=&playercomp=white&yearcomp=&result=1-0&eco=&pos=
+%Chess.com analysis: https://www.chess.com/article/view/chess-statistics-why-does-white-win-more
+%The Oxford Companion to Chess, 2nd edition, by David Hooper and Kenneth Whyld
+%The comparison of the Glicko system with the Elo system is based on various sources, including:
+
+%Mark E. Glickman's paper on the Glicko system: http://www.glicko.net/glicko/glicko.pdf
+%The official Elo rating system website: https://www.fide.com/fide/handbook.html?id=174&view=article
+%The book "Rating of Chessplayers, Past and Present" by Arpad Elo
+
+%Dit hoofdstuk bevat je literatuurstudie. De inhoud gaat verder op de inleiding, maar zal het onderwerp van de bachelorproef *diepgaand* uitspitten. De bedoeling is dat de lezer na lezing van dit hoofdstuk helemaal op de hoogte is van de huidige stand van zaken (state-of-the-art) in het onderzoeksdomein. Iemand die niet vertrouwd is met het onderwerp, weet nu voldoende om de rest van het verhaal te kunnen volgen, zonder dat die er nog andere informatie moet over opzoeken \autocite{Pollefliet2011}.
+
+%Je verwijst bij elke bewering die je doet, vakterm die je introduceert, enz.\ naar je bronnen. In \LaTeX{} kan dat met het commando \texttt{$\backslash${textcite\{\}}} of \texttt{$\backslash${autocite\{\}}}. Als argument van het commando geef je de ``sleutel'' van een ``record'' in een bibliografische databank in het Bib\LaTeX{}-formaat (een tekstbestand). Als je expliciet naar de auteur verwijst in de zin, gebruik je \texttt{$\backslash${}textcite\{\}}.
+%Soms wil je de auteur niet expliciet vernoemen, dan gebruik je \texttt{$\backslash${}autocite\{\}}. In de volgende paragraaf een voorbeeld van elk.
+
+%\textcite{Knuth1998} schreef een van de standaardwerken over sorteer- en zoekalgoritmen. Experten zijn het erover eens dat cloud computing een interessante opportuniteit vormen, zowel voor gebruikers als voor dienstverleners op vlak van informatietechnologie~\autocite{Creeger2009}.
+
+%\lipsum[7-20]

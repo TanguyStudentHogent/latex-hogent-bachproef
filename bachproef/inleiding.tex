@@ -2,37 +2,53 @@
 %% Inleiding
 %%=============================================================================
 
-\chapter{\IfLanguageName{dutch}{Inleiding}{Introduction}}
+\chapter{\IfLanguageName{dutch}{Inleiding}{Introduction}}%
 \label{ch:inleiding}
 
-De inleiding moet de lezer net genoeg informatie verschaffen om het onderwerp te begrijpen en in te zien waarom de onderzoeksvraag de moeite waard is om te onderzoeken. In de inleiding ga je literatuurverwijzingen beperken, zodat de tekst vlot leesbaar blijft. Je kan de inleiding verder onderverdelen in secties als dit de tekst verduidelijkt. Zaken die aan bod kunnen komen in de inleiding~\autocite{Pollefliet2011}:
+Schaken is een strategisch bordspel voor twee spelers, gespeeld op een schaakbord waarop elk speelstuk volgens precieze regels wordt verplaatst. Elke speler mag om de beurt een zet doen met een stuk op het schaakbord. Het doel van het spel is om de koning van de tegenstander rechtstreeks aan te vallen waaruit ontsnappen onmogelijk is. Dit heet schaakmat. Één speler speelt met witte schaakstukken en de andere speler met zwarte schaakstukken. Dit is een belangrijk element, want de speler met de witte schaakstukken mag als eerste een zet plaatsen in het spel. Dit geeft ook een statistisch voordeel voor de speler met de witte schaakstukken om het spel te winnen. Officiële schaakpartijen moeten de door het FIDE opgelegde beleid volgen.
 
+In deze paper onderzoeken we op welke wijze de uitkomst van professionele schaakmatches voorspeld kan worden. We zullen hiervoor data analyseren en deze in combinatie met machine learning verwerken om een model op te stellen. Het doel van dit model is om de uitkomst van schaakmatches te bepalen met een nauwkeurigheid van minstens 95\%.
+
+In dit onderzoek worden de volgende onderwerpen aangehaald:
 \begin{itemize}
-  \item context, achtergrond
-  \item afbakenen van het onderwerp
-  \item verantwoording van het onderwerp, methodologie
-  \item probleemstelling
-  \item onderzoeksdoelstelling
-  \item onderzoeksvraag
-  \item \ldots
+    \item context, achtergrond
+    \item afbakenen van het onderwerp
+    \item verantwoording van het onderwerp, methodologie
+    \item probleemstelling
+    \item onderzoeksdoelstelling
+    \item onderzoeksvraag
+    \item \ldots
 \end{itemize}
 
-\section{\IfLanguageName{dutch}{Probleemstelling}{Problem Statement}}
+\section{\IfLanguageName{dutch}{Probleemstelling}{Problem Statement}}%
 \label{sec:probleemstelling}
 
-Uit je probleemstelling moet duidelijk zijn dat je onderzoek een meerwaarde heeft voor een concrete doelgroep. De doelgroep moet goed gedefinieerd en afgelijnd zijn. Doelgroepen als ``bedrijven,'' ``KMO's,'' systeembeheerders, enz.~zijn nog te vaag. Als je een lijstje kan maken van de personen/organisaties die een meerwaarde zullen vinden in deze bachelorproef (dit is eigenlijk je steekproefkader), dan is dat een indicatie dat de doelgroep goed gedefinieerd is. Dit kan een enkel bedrijf zijn of zelfs één persoon (je co-promotor/opdrachtgever).
+%Uit je probleemstelling moet duidelijk zijn dat je onderzoek een meerwaarde heeft voor een concrete doelgroep. De doelgroep moet goed gedefinieerd en afgelijnd zijn. Doelgroepen als ``bedrijven,'' ``KMO's'', systeembeheerders, enz.~zijn nog te vaag. Als je een lijstje kan maken van de personen/organisaties die een meerwaarde zullen vinden in deze bachelorproef (dit is eigenlijk je steekproefkader), dan is dat een indicatie dat de doelgroep goed gedefinieerd is. Dit kan een enkel bedrijf zijn of zelfs één persoon (je co-promotor/opdrachtgever).
 
-\section{\IfLanguageName{dutch}{Onderzoeksvraag}{Research question}}
+\section{\IfLanguageName{dutch}{Onderzoeksvraag}{Research question}}%
 \label{sec:onderzoeksvraag}
 
-Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
+Het onderzoek kan verdeeld worden over een aantal deelvragen:
+\begin{itemize}
+    \item Vanwaar halen we de data op en waarom?
+    \item Hoe kunnen we deze data omzetten om inzicht te krijgen om schaakmatches te voorspellen?
+    \item Op welke wijze kan de uitkomst van professionele schaakmatches voorspeld worden?
+    \item Wat is de uitkomst van een potentiële schaakmatch tussen 2 grootmeesters?
+    \item Hoe accuraat is de voorspelling die gemaakt wordt aan de hand van machine learning?
+\end{itemize}
 
-\section{\IfLanguageName{dutch}{Onderzoeksdoelstelling}{Research objective}}
+Er zijn talloze schaakpartijen gespeeld door grootmeesters, die allemaal waardevolle informatie bevatten over strategieën en patronen in het spel. Het gebruik van deze data kan bijdragen aan de ontwikkeling van geavanceerde schaakalgoritmes die in staat zijn om voorspellingen te doen over de uitkomst van partijen en de speelstijl van spelers. Er zijn echter verschillende uitdagingen bij het gebruik van deze data, zoals het bepalen van de juiste database, het verwerken van de gegevens en het interpreteren van de resultaten. Bovendien is er nog veel onbekend over waarom wit vaker wint dan zwart in professionele schaakpartijen en hoe de verschillende ratingssystemen, zoals Glicko en ELO, zich tot elkaar verhouden. Deze problemen vormen de basis van de onderzoeksvraag.
+
+%Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
+
+\section{\IfLanguageName{dutch}{Onderzoeksdoelstelling}{Research objective}}%
 \label{sec:onderzoeksdoelstelling}
 
-Wat is het beoogde resultaat van je bachelorproef? Wat zijn de criteria voor succes? Beschrijf die zo concreet mogelijk. Gaat het bv. om een proof-of-concept, een prototype, een verslag met aanbevelingen, een vergelijkende studie, enz.
+De doelstelling van dit onderzoek luidt: Het voorspellen van professionele schaakmatches door middel van machine learning, met focus op partijen gespeeld door Grootmeesters in rapid, blitz- en standaard- tijdsformaat
 
-\section{\IfLanguageName{dutch}{Opzet van deze bachelorproef}{Structure of this bachelor thesis}}
+%Wat is het beoogde resultaat van je bachelorproef? Wat zijn de criteria voor succes? Beschrijf die zo concreet mogelijk. Gaat het bv.\ om een proof-of-concept, een prototype, een verslag met aanbevelingen, een vergelijkende studie, enz.
+
+\section{\IfLanguageName{dutch}{Opzet van deze bachelorproef}{Structure of this bachelor thesis}}%
 \label{sec:opzet-bachelorproef}
 
 % Het is gebruikelijk aan het einde van de inleiding een overzicht te
@@ -47,4 +63,4 @@ In Hoofdstuk~\ref{ch:methodologie} wordt de methodologie toegelicht en worden de
 
 % TODO: Vul hier aan voor je eigen hoofstukken, één of twee zinnen per hoofdstuk
 
-In Hoofdstuk~\ref{ch:conclusie}, tenslotte, wordt de conclusie gegeven en een antwoord geformuleerd op de onderzoeksvragen. Daarbij wordt ook een aanzet gegeven voor toekomstig onderzoek binnen dit domein.
+In hoofdstuk~\ref{ch:conclusie}, tenslotte, wordt de conclusie gegeven en een antwoord geformuleerd op de onderzoeksvragen. Daarbij wordt ook een aanzet gegeven voor toekomstig onderzoek binnen dit domein.

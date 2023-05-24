@@ -16,9 +16,9 @@ Zodra alle vereiste data beschikbaar is, wordt de data voorbereid voor het gedee
 
 Vervolgens wordt het best mogelijke AI-model getraind. Verschillende modellen zullen worden geëvalueerd en getest om het meest optimale model te identificeren. Dit model zal verder worden verfijnd om een nauwkeurigheidsscore van 95\% te behalen.
 
-Ten slotte zal er een kleine applicatie worden ontwikkeld waarin gebruikers de mogelijkheid krijgen om, op basis van het getrainde model, voorspellingen te doen over schaakpartijen tussen twee grootmeesters.
+Ten slotte zal er een kleine applicatie worden ontwikkeld waarin gebruikers de mogelijkheid krijgen om, op basis van het getrainde model, voorspellingen te doen over schaakpartijen tussen twee grootmeesters. Om een applicatie te genereren, kan de code lokaal worden uitgevoerd of kan het commando 'pyinstaller --onefile bestandsnaam.py' worden gebruikt. Dit commando resulteert in de creatie van een uitvoerbaar bestand dat de code in de vorm van een applicatie laat draaien.
 
-Door deze methodische aanpak kan het onderzoek gestructureerd worden uitgevoerd, waarbij de focus ligt op het verkrijgen van betrouwbare data, het analyseren ervan, het trainen van een nauwkeurig AI-model en het ontwikkelen van een gebruiksvriendelijke applicatie.
+Door deze methodische aanpak kan het onderzoek gestructureerd worden uitgevoerd, waarbij de focus ligt op het verkrijgen van betrouwbare data, het analyseren ervan, het trainen van een nauwkeurig AI-model en het ontwikkelen van een gebruiksvriendelijke applicatie. 
 
 \section{Ophalen data}
 
@@ -127,6 +127,8 @@ Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er 
 
 \section{Filtering data}
 
+\subsection{Verstandhouding}
+
 Er zijn drie csv-bestanden gemaakt vanuit het scraping-process. Één bestand voor elke tijdscategorie (standaard, blitz en rapid). De inhoud van deze csv-bestanden houden alle partijen van grootmeesters die tegen een andere grootmeester gespeeld hebben in. Deze bevatten een aantal kolommen. De kolommen zijn als volgt:
 
 \begin{itemize}
@@ -150,11 +152,15 @@ Er zijn drie csv-bestanden gemaakt vanuit het scraping-process. Één bestand vo
 
 Technisch gezien hebben we alle data dat we nodig hebben hier. Echter vertonen er snel drie problemen.
 
+\subsection{Problematiek}
+
 Probleem 1: Er zijn heel wat overbodige kolommen met data dat weinig tot geen meerwaarde brengen. Perfecte voorbeelden hiervan is de kolom 'Titel speler' en 'Titel tegenstander'. De eerder vermelde scrapers die opgebouwd zijn met filters, zorgen ervoor dat er enkel mensen met de titel grootmeester in de dataset zitten. 
 
 Probleem 2: De rating van de tegenstander staat op elke lijn vermeldt. Dit is een dynamisch gegeven want de ELO-rating van elke speler wordt pas geüpdate de dag nadat die persoon zijn of haar partijen heeft gespeeld. Deze traag-veranderde waarde is correct voor elke grootmeester maar het probleem is dat er geen kolom is met de ELO-rating van de speler zelf. Zo is het mogelijk om een vergelijking te doen van skill-niveau tussen de twee spelers.
 
 Probleem 3: Alle partijen staan dubbel in het bestand. Als speler x tegen speler y een partij heeft gespeeld op datum z, dan zal dit ook zo staan in de historiek van speler x. Dezelfde logica is ook toepasbaar voor speler y. Dit wil zeggen dat er een record in het csv-bestand zal zijn waarbij speler y tegen speler x heeft gespeeld op dag z. Dit kan een probleem vormen bij het trainen van een model omdat je dubbele data zal trainen en hiermee de nauwkeurigheid mee kan affecteren. 
+
+\subsection{Oplossingen}
 
 Het eerste probleem aanpakken is vrij simpel. De applicatie zal de overbodige kolommen verwijderen. Het moeilijkste aan dit process, is kiezen welke kolommen er weg moeten.
 \begin{lstlisting}[language=Python]
@@ -174,4 +180,43 @@ Het eerste probleem aanpakken is vrij simpel. De applicatie zal de overbodige ko
 De kolom k wordt gedroppt met de reden dat deze kolom dezelfde waarde bevatte voor alle grootmeesters. In het regulatiedocument gemaakt door de \textcite{FIDE2021}, staat de k in als de ontwikkelingscoëfficiënt. Rating-systemen behandelen mensen die een tijd niet meer hebben gespeeld, of nieuw zijn in schaken als 'volatile'. Dit wil zeggen dat hun rating-increment meer wordt beïnvloedt. Het belangrijkste detail aan deze statistiek is dat deze waarde tien is voor alle grootmeesters. Dit komt omdat eenmaal een persoon een ELO-rating van 2400 behaalt, deze factor automatisch naar 10 zakt, ookal zou dit twintig, dertig of veertig zijn. Dit beïnvloedt de ELO-gain en ELO-loss na een match maar is voor onze dataset niet van toepassing en heeft geen effect. Op vlak van schaalbaarheid is dit wel anders, indien later een onderzoek wil gevoerd worden over nationale meesters of FIDE-meesters, dan kan dit wel een invloedsfactor zijn voor het trainen van een model. 
 
 De volgende keuze was moeilijk te maken. De kolom chg en kchg bevatten technisch dezelfde data enkel is het verscil dat de waardes in kchg exact vermenigvuldigd zijn met de factor tien ten op zichte van chg. Doordat dit twee kolommen zijn die dezelfde data bevatten, moet er één wegvallen. De keuze dat chg wegvalt is omdat kchg ook staat als ELO-gain/ELO-loss voor die partij. Maar waarvoor precies staat chg?
+
+Chg staat voor de kans dat de speler wint/of verliest. In de literatuurstudie is hierop dieper ingegaan en samen met de 'volatitity-factor' die al is meegerekend in Kchg, is het beter dat voor dit onderzoek de kolom chg weg wordt laten gevallen.
+
+Kolom n is de totaalwaarde van de uitkomst van de spelers. Met dat schaken een nul-som spel is (een spel waarbij het totaaal aantal winnende spellen gelijk is and het totaal aantal verliezende spellen), betekent dat deze waarde altijd hetzelfde zal zijn voor elke rij. De totaal waarde is één doordat winnen de winnende speler één punt oplevert en de verliezende speler nul, en bij gelijkspel krijgen beide spelers een halve punt. 
+
+De locatie en evenement zouden normaal geen rol moeten spelen op de data. In tegenstelling tot voetbal of andere sporten waarbij supporters psylogische aanmoediging, prestatiedruk of stress kunnen geven, is dit bij schaken erchter niet zo. De zalen zijn afgesloten en ookal kan locatie een verschil maken op vlak van slaapritme, de meeste professionele schakers zorgen ervoor dat dit hun niet affecteert. Schaken is ook een mentaal spel waarbij het hoofd koel houden heel belangrijk is, is het ook dat externe factoren iemand niet kan afleiden. 
+
+Het land van afkomst voor beide spelers zou ook geen effect mogen hebben op de dataset. Het is niet zoals rensport waarbij mensen vanuit Kenia, die trainen in de hoge bergen, daardoor een beter lichamelijk eco-systeem ontwikkelen dat dit ook van toepassing is bij schaken. Iemand zijn performantie is gebaseerd op wat de persoon en geleerd heeft over het spel. Dit is ook om te vermijden dat bijvoorbeeld een land over-gerepresenteerd wordt of onder-gerepresenteerd wordt. Een goed voorbeeld hiervan is dat Magnus Carlsen afkomstig is uit Noorwegen en er nog twintig grootmeesters uit Noorwegen komen (van de 1800+). Met dat hij veel meer spellen wint tegen ook veel sterkere tegenstanders, zou het AI model hierop misschien ook dingen kunnen van opnemen en verkeerde conclusies uit trekken.
+
+Als laatste zijn de spelers' titels ook niet meer van belang voor de dataset met dat overal de titel grootmeester (g) is toegekend en deze dataset ook gefilterd werd op enkel grootmeesters.
+
+Het tweede probleem heeft een duidelijke oplossingslijn die elegant kan toegepast worden, echter de implementatie om dit te vinden was zeer moeilijk. 
+
+\begin{lstlisting}[language=Python]
+    df_games_rating = df_games[['date','player_name','opponent_name','opponent_rating']]
+    def fail(row):
+        df_result = df_games_rating[(df_games_rating.date == row.date) & (df_games_rating.player_name == row.opponent_name) & (df_games_rating.opponent_name == row.player_name)]
+        return str(df_result.opponent_rating.values[0]) if not df_result.empty else ''
+    df_games['current_rating'] = df_games[['date','player_name','opponent_name','opponent_rating']].apply(fail, axis=1)
+\end{lstlisting}
+
+Het doel van de code is dat we een nieuwe kolom 'current rating' aanmaken waarbij de rating van de speler kan getoond worden dat die persoon had op die dag tegen zijn tegenstander. Het programma zal de huidige ELO-rating van de speler als 'df result' opslaan. Deze waarde wordt opgehaald door de record te zoeken waarbij de datum gelijk is aan de originele record, en waarbij 'naam speler' en 'naam tegenstander' omgewisseld zijn. Als het programma dan deze record heeft gevonden, zal het de rating van de tegenstander teruggeven (wat gelijk is aan de rating van de speler waarna we het op zoek waren). Dan zal er een nieuwe kolom aangemaakt worden waarbij deze waarde zal aan toegevoegd worden. Het argument axis=1 geeft aan dat de sorteerbewerking moet worden toegepast op elke rij. 
+
+Het probleem kon aangepakt worden met een lamba-fucntie. Dit is getest geweest maar is nooit gelukt geweest en heeft altijd voor problemen gezorgd. De manier hoe dit nu beschreven staat, werkt.
+
+Het laatste probleem kan op een gelijkaardige aanpak opgelost worden.
+
+\begin{lstlisting}[language=Python]
+    df_sorted = df_games.copy()
+    df_sorted[['date','player_name', 'opponent_name']] = df_sorted[['date','player_name', 'opponent_name']].apply(sorted, axis=1, result_type='expand')
+    name_not_switched = (df_sorted['player_name'] == df_games['player_name'])
+    df_games = df_sorted.loc[name_not_switched]
+\end{lstlisting}
+
+Er wordt een kopie gemaakt van de oorspronkelijke DataFrame df games en toegewezen aan df sorted. Dit zorgt ervoor dat we de oorspronkelijke DataFrame behouden terwijl we wijzigingen aanbrengen in df sorted. In de volgende regel worden de kolommen 'date', 'player name' en 'opponent name' van df sorted opnieuw toegewezen door de sorted-functie toe te passen op elke rij. Dit sorteert de waarden in elke rij van deze kolommen in oplopende volgorde. Het argument result type='expand' zorgt ervoor dat de resultaten van de sorteerbewerking worden uitgebreid naar meerdere kolommen. Daarachter wordt een booleaanse serie name not switched gemaakt waarin wordt gecontroleerd of de waarden in de kolom 'player name' van df sorted overeenkomen met de waarden in de kolom 'player name' van de oorspronkelijke DataFrame df games. En in de laatste rij wordt de DataFrame df games  bijgewerkt door alleen de rijen te behouden waarin de waarden in de kolom 'player name' overeenkomen met de waarden in de kolom 'player name' van df sorted. Dit resulteert in een gefilterde DataFrame waarin alleen de rijen staan waarin de speler niet van positie is gewisseld met de tegenstander, m.a.w. de dubbele record eruit gehaald.
+
+Deze applicatie heeft ervoor gezorgd dat er een nieuw csv-bestand bestaat met alle nodige data om het model te trainen.
+
+\section{Voorbereiden data}
 
