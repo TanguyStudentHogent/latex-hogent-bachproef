@@ -129,7 +129,7 @@ Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er 
 
 \subsection{Verstandhouding}
 
-Er zijn drie csv-bestanden gemaakt vanuit het scraping-process. Één bestand voor elke tijdscategorie (standaard, blitz en rapid). De inhoud van deze csv-bestanden houden alle partijen van grootmeesters die tegen een andere grootmeester gespeeld hebben in. Deze bevatten een aantal kolommen. De kolommen zijn als volgt:
+Tijdens het scraping-proces zijn drie csv-bestanden gegenereerd, elk bestand vertegenwoordigt een specifieke tijdscategorie (standaard, blitz en rapid). Deze csv-bestanden bevatten uitgebreide informatie over partijen gespeeld tussen grootmeesters. Ze omvatten verschillende kolommen die als volgt zijn gestructureerd:
 
 \begin{itemize}
     \item Datum
@@ -150,19 +150,20 @@ Er zijn drie csv-bestanden gemaakt vanuit het scraping-process. Één bestand vo
     \item Kleur => kleur van speler
 \end{itemize}
 
-Technisch gezien hebben we alle data dat we nodig hebben hier. Echter vertonen er snel drie problemen.
+Hoewel technisch gezien alle benodigde gegevens verzameld zijn, doen zich echter snel drie problemen voor.
 
 \subsection{Problematiek}
 
-Probleem 1: Er zijn heel wat overbodige kolommen met data dat weinig tot geen meerwaarde brengen. Perfecte voorbeelden hiervan is de kolom 'Titel speler' en 'Titel tegenstander'. De eerder vermelde scrapers die opgebouwd zijn met filters, zorgen ervoor dat er enkel mensen met de titel grootmeester in de dataset zitten. 
+Probleem 1: Er zijn verschillende overbodige kolommen met data die weinig tot geen toegevoegde waarde bieden. Dit geldt met name voor de kolommen 'Titel speler' en 'Titel tegenstander'. Aangezien de eerder vermelde scrapers zijn ingesteld met filters om alleen grootmeesters op te nemen in de dataset, bevatten deze kolommen redundantie.
 
-Probleem 2: De rating van de tegenstander staat op elke lijn vermeldt. Dit is een dynamisch gegeven want de ELO-rating van elke speler wordt pas geüpdate de dag nadat die persoon zijn of haar partijen heeft gespeeld. Deze traag-veranderde waarde is correct voor elke grootmeester maar het probleem is dat er geen kolom is met de ELO-rating van de speler zelf. Zo is het mogelijk om een vergelijking te doen van skill-niveau tussen de twee spelers.
+Probleem 2: De rating van de tegenstander wordt vermeld op elke regel. Deze rating is een dynamische waarde, aangezien de ELO-rating van elke speler pas wordt bijgewerkt op de dag nadat ze hun partijen hebben gespeeld. Hoewel deze langzaam veranderende waarde correct is voor elke grootmeester, ontbreekt er een kolom met de ELO-rating van de speler zelf. Hierdoor is het niet mogelijk om een directe vergelijking te maken van het vaardigheidsniveau tussen de twee spelers.
 
-Probleem 3: Alle partijen staan dubbel in het bestand. Als speler x tegen speler y een partij heeft gespeeld op datum z, dan zal dit ook zo staan in de historiek van speler x. Dezelfde logica is ook toepasbaar voor speler y. Dit wil zeggen dat er een record in het csv-bestand zal zijn waarbij speler y tegen speler x heeft gespeeld op dag z. Dit kan een probleem vormen bij het trainen van een model omdat je dubbele data zal trainen en hiermee de nauwkeurigheid mee kan affecteren. 
+Probleem 3: Er is een duplicatie van partijen in het bestand. Als speler X tegen speler Y een partij heeft gespeeld op datum Z, dan zal deze informatie ook voorkomen in de historie van speler Y. Op dezelfde manier zal er een record in het CSV-bestand zijn waarbij speler Y tegen speler X heeft gespeeld op dezelfde dag Z. Dit leidt tot dubbele gegevens en kan een probleem vormen bij het trainen van een model, omdat dit de nauwkeurigheid van het model kan beïnvloeden.
 
 \subsection{Oplossingen}
 
-Het eerste probleem aanpakken is vrij simpel. De applicatie zal de overbodige kolommen verwijderen. Het moeilijkste aan dit process, is kiezen welke kolommen er weg moeten.
+Het eerste probleem kan op een relatief eenvoudige manier worden aangepakt. De applicatie zal de overbodige kolommen verwijderen. Het uitdagendste aspect van dit proces is echter het maken van de juiste keuze welke kolommen verwijderd moeten worden. Dit vereist zorgvuldige afweging en het bepalen van welke kolommen weinig tot geen toegevoegde waarde bieden voor de analyse of het beoogde doel van de gegevensverwerking. Het is belangrijk om rekening te houden met de specifieke vereisten en doelstellingen van het project om een weloverwogen beslissing te nemen over welke kolommen behouden moeten blijven en welke kunnen worden verwijderd.
+
 \begin{lstlisting}[language=Python]
     import pandas as pd
     df_games = pd.read_csv(games_file_name)
@@ -177,21 +178,20 @@ Het eerste probleem aanpakken is vrij simpel. De applicatie zal de overbodige ko
     df_games = df_games.drop('player_title', axis=1)
 \end{lstlisting}
 
-De kolom k wordt gedroppt met de reden dat deze kolom dezelfde waarde bevatte voor alle grootmeesters. In het regulatiedocument gemaakt door de \textcite{FIDE2021}, staat de k in als de ontwikkelingscoëfficiënt. Rating-systemen behandelen mensen die een tijd niet meer hebben gespeeld, of nieuw zijn in schaken als 'volatile'. Dit wil zeggen dat hun rating-increment meer wordt beïnvloedt. Het belangrijkste detail aan deze statistiek is dat deze waarde tien is voor alle grootmeesters. Dit komt omdat eenmaal een persoon een ELO-rating van 2400 behaalt, deze factor automatisch naar 10 zakt, ookal zou dit twintig, dertig of veertig zijn. Dit beïnvloedt de ELO-gain en ELO-loss na een match maar is voor onze dataset niet van toepassing en heeft geen effect. Op vlak van schaalbaarheid is dit wel anders, indien later een onderzoek wil gevoerd worden over nationale meesters of FIDE-meesters, dan kan dit wel een invloedsfactor zijn voor het trainen van een model. 
+De kolom 'k' wordt verwijderd omdat deze kolom dezelfde waarde bevat voor alle grootmeesters. Volgens het regulatiedocument opgesteld door de \textcite{FIDE2021}, vertegenwoordigt 'k' de ontwikkelingscoëfficiënt. Rating-systemen behandelen spelers die lange tijd niet hebben gespeeld of nieuw zijn in het schaken als 'volatile'. Dit betekent dat hun rating-verandering sterker wordt beïnvloed. Het belangrijke detail van deze statistiek is dat de waarde van 'k' voor alle grootmeesters gelijk is aan tien. Dit komt doordat zodra een speler een ELO-rating van 2400 bereikt, deze factor automatisch wordt vastgesteld op tien, ongeacht of het oorspronkelijk twintig, dertig of veertig was. Hoewel dit van invloed is op de ELO-winst en ELO-verlies na een partij, is dit voor onze dataset niet relevant en heeft het geen effect. Het kan echter wel een belangrijke factor zijn voor schaalbaarheid, mocht er in de toekomst onderzoek worden gedaan naar nationale meesters of FIDE-meesters, waarbij het trainen van een model beïnvloed kan worden door deze factor.
 
-De volgende keuze was moeilijk te maken. De kolom chg en kchg bevatten technisch dezelfde data enkel is het verscil dat de waardes in kchg exact vermenigvuldigd zijn met de factor tien ten op zichte van chg. Doordat dit twee kolommen zijn die dezelfde data bevatten, moet er één wegvallen. De keuze dat chg wegvalt is omdat kchg ook staat als ELO-gain/ELO-loss voor die partij. Maar waarvoor precies staat chg?
 
-Chg staat voor de kans dat de speler wint/of verliest. In de literatuurstudie is hierop dieper ingegaan en samen met de 'volatitity-factor' die al is meegerekend in Kchg, is het beter dat voor dit onderzoek de kolom chg weg wordt laten gevallen.
+De kolom 'chg' vertegenwoordigt de kans dat een speler wint of verliest. In de literatuurstudie is dit aspect nader onderzocht en gezien de aanwezigheid van de 'volatility-factor' die al wordt meegenomen in 'kchg', is het voor dit onderzoek beter om de kolom 'chg' te verwijderen. Aangezien beide kolommen technisch gezien dezelfde data bevatten, met alleen het verschil dat de waarden in 'kchg' vermenigvuldigd zijn met een factor van tien ten opzichte van 'chg', is het logischer om 'chg' te laten vallen en 'kchg' te behouden. Hierdoor kunnen we ons concentreren op de ELO-winst/-verlies in 'kchg' voor elke partij, wat meer relevant is voor het onderzoek.
 
-Kolom n is de totaalwaarde van de uitkomst van de spelers. Met dat schaken een nul-som spel is (een spel waarbij het totaaal aantal winnende spellen gelijk is and het totaal aantal verliezende spellen), betekent dat deze waarde altijd hetzelfde zal zijn voor elke rij. De totaal waarde is één doordat winnen de winnende speler één punt oplevert en de verliezende speler nul, en bij gelijkspel krijgen beide spelers een halve punt. 
+De kolom 'n' vertegenwoordigt de totale waarde van de uitkomst van de spelers. Aangezien schaken een nul-som spel is, wat betekent dat het totale aantal gewonnen spellen gelijk is aan het totale aantal verloren spellen, zal deze waarde altijd hetzelfde zijn voor elke rij in het dataset. De totale waarde is in dit geval één, omdat een winnende speler één punt ontvangt, de verliezende speler nul punten krijgt, en bij een gelijkspel ontvangen beide spelers een half punt.
 
-De locatie en evenement zouden normaal geen rol moeten spelen op de data. In tegenstelling tot voetbal of andere sporten waarbij supporters psylogische aanmoediging, prestatiedruk of stress kunnen geven, is dit bij schaken erchter niet zo. De zalen zijn afgesloten en ookal kan locatie een verschil maken op vlak van slaapritme, de meeste professionele schakers zorgen ervoor dat dit hun niet affecteert. Schaken is ook een mentaal spel waarbij het hoofd koel houden heel belangrijk is, is het ook dat externe factoren iemand niet kan afleiden. 
+De kolommen 'locatie' en 'evenement' zouden normaal gesproken geen significante invloed moeten hebben op de data. In tegenstelling tot sporten zoals voetbal of andere sporten waarbij supporters psychologische aanmoediging, prestatiedruk of stress kunnen veroorzaken, is dit bij schaken niet het geval. Schaakzalen zijn meestal afgesloten om afleiding te minimaliseren, en hoewel de locatie mogelijk een verschil kan maken in slaapritme, zorgen de meeste professionele schakers ervoor dat externe factoren hen niet beïnvloeden. Schaken is een mentaal spel waarbij het behouden van een heldere geest cruciaal is, en daarom worden externe factoren die iemand kunnen afleiden doorgaans geminimaliseerd.
 
-Het land van afkomst voor beide spelers zou ook geen effect mogen hebben op de dataset. Het is niet zoals rensport waarbij mensen vanuit Kenia, die trainen in de hoge bergen, daardoor een beter lichamelijk eco-systeem ontwikkelen dat dit ook van toepassing is bij schaken. Iemand zijn performantie is gebaseerd op wat de persoon en geleerd heeft over het spel. Dit is ook om te vermijden dat bijvoorbeeld een land over-gerepresenteerd wordt of onder-gerepresenteerd wordt. Een goed voorbeeld hiervan is dat Magnus Carlsen afkomstig is uit Noorwegen en er nog twintig grootmeesters uit Noorwegen komen (van de 1800+). Met dat hij veel meer spellen wint tegen ook veel sterkere tegenstanders, zou het AI model hierop misschien ook dingen kunnen van opnemen en verkeerde conclusies uit trekken.
+Het land van herkomst voor beide spelers zou naar verwachting geen invloed moeten hebben op de dataset. In tegenstelling tot bijvoorbeeld paardenraces, waarbij atleten uit bepaalde regio's mogelijk fysieke voordelen hebben als gevolg van training op grote hoogte, geldt dit niet voor schaken. De prestaties van een schaker zijn voornamelijk gebaseerd op zijn of haar kennis en vaardigheden in het spel. Het vermijden van landgebonden factoren helpt ook om te voorkomen dat bepaalde landen oververtegenwoordigd of ondervertegenwoordigd worden in de dataset. Een goed voorbeeld hiervan is Magnus Carlsen, die afkomstig is uit Noorwegen en daar vele sterke tegenstanders heeft. Als het AI-model gevoelig zou zijn voor het land van herkomst, zou het mogelijk verkeerde conclusies kunnen trekken op basis van deze specifieke situatie.
 
-Als laatste zijn de spelers' titels ook niet meer van belang voor de dataset met dat overal de titel grootmeester (g) is toegekend en deze dataset ook gefilterd werd op enkel grootmeesters.
+Ten slotte zijn de titels van de spelers ook niet langer relevant voor de dataset, omdat alle spelers in de dataset de titel "grootmeester" (g) hebben en de dataset al gefilterd is op alleen grootmeesters. Daarom kunnen de kolommen met de spelers' titels veilig worden verwijderd, aangezien ze geen extra waarde toevoegen aan de analyse.
 
-Het tweede probleem heeft een duidelijke oplossingslijn die elegant kan toegepast worden, echter de implementatie om dit te vinden was zeer moeilijk. 
+Het tweede probleem kan op een elegante manier worden opgelost met een duidelijke aanpak, maar de implementatie van deze oplossing was uitdagend.
 
 \begin{lstlisting}[language=Python]
     df_games_rating = df_games[['date','player_name','opponent_name','opponent_rating']]
@@ -203,9 +203,9 @@ Het tweede probleem heeft een duidelijke oplossingslijn die elegant kan toegepas
 
 Het doel van de code is dat we een nieuwe kolom 'current rating' aanmaken waarbij de rating van de speler kan getoond worden dat die persoon had op die dag tegen zijn tegenstander. Het programma zal de huidige ELO-rating van de speler als 'df result' opslaan. Deze waarde wordt opgehaald door de record te zoeken waarbij de datum gelijk is aan de originele record, en waarbij 'naam speler' en 'naam tegenstander' omgewisseld zijn. Als het programma dan deze record heeft gevonden, zal het de rating van de tegenstander teruggeven (wat gelijk is aan de rating van de speler waarna we het op zoek waren). Dan zal er een nieuwe kolom aangemaakt worden waarbij deze waarde zal aan toegevoegd worden. Het argument axis=1 geeft aan dat de sorteerbewerking moet worden toegepast op elke rij. 
 
-Het probleem kon aangepakt worden met een lamba-fucntie. Dit is getest geweest maar is nooit gelukt geweest en heeft altijd voor problemen gezorgd. De manier hoe dit nu beschreven staat, werkt.
+Het probleem werd aangepakt met een lambda-functie, maar helaas leverde dit geen succes op en veroorzaakte het problemen. De huidige beschreven aanpak heeft daarentegen wel gewerkt.
 
-Het laatste probleem kan op een gelijkaardige aanpak opgelost worden.
+Het laatste probleem kan op een vergelijkbare manier worden opgelost.
 
 \begin{lstlisting}[language=Python]
     df_sorted = df_games.copy()
@@ -214,9 +214,13 @@ Het laatste probleem kan op een gelijkaardige aanpak opgelost worden.
     df_games = df_sorted.loc[name_not_switched]
 \end{lstlisting}
 
-Er wordt een kopie gemaakt van de oorspronkelijke DataFrame df games en toegewezen aan df sorted. Dit zorgt ervoor dat we de oorspronkelijke DataFrame behouden terwijl we wijzigingen aanbrengen in df sorted. In de volgende regel worden de kolommen 'date', 'player name' en 'opponent name' van df sorted opnieuw toegewezen door de sorted-functie toe te passen op elke rij. Dit sorteert de waarden in elke rij van deze kolommen in oplopende volgorde. Het argument result type='expand' zorgt ervoor dat de resultaten van de sorteerbewerking worden uitgebreid naar meerdere kolommen. Daarachter wordt een booleaanse serie name not switched gemaakt waarin wordt gecontroleerd of de waarden in de kolom 'player name' van df sorted overeenkomen met de waarden in de kolom 'player name' van de oorspronkelijke DataFrame df games. En in de laatste rij wordt de DataFrame df games  bijgewerkt door alleen de rijen te behouden waarin de waarden in de kolom 'player name' overeenkomen met de waarden in de kolom 'player name' van df sorted. Dit resulteert in een gefilterde DataFrame waarin alleen de rijen staan waarin de speler niet van positie is gewisseld met de tegenstander, m.a.w. de dubbele record eruit gehaald.
+De oorspronkelijke DataFrame 'df games' wordt gekopieerd naar 'df sorted' om de oorspronkelijke gegevens te behouden tijdens het uitvoeren van wijzigingen. Vervolgens worden de kolommen 'date', 'player name' en 'opponent name' van 'df sorted' opnieuw toegewezen door de 'sorted'-functie toe te passen op elke rij. Hierdoor worden de waarden in elke rij van deze kolommen gesorteerd in oplopende volgorde.
 
-Deze applicatie heeft ervoor gezorgd dat er een nieuw csv-bestand bestaat met alle nodige data om het model te trainen.
+Met het argument 'result type='expand'' wordt ervoor gezorgd dat de resultaten van de sorteerbewerking worden uitgebreid naar meerdere kolommen. Daarna wordt een booleaanse serie 'name not switched' gemaakt waarin wordt gecontroleerd of de waarden in de kolom 'player name' van 'df sorted' overeenkomen met de waarden in de kolom 'player name' van de oorspronkelijke DataFrame 'df games'.
+
+Ten slotte wordt de DataFrame 'df games' bijgewerkt door alleen de rijen te behouden waarin de waarden in de kolom 'player name' overeenkomen met de waarden in de kolom 'player name' van 'df sorted'. Hierdoor wordt een gefilterde DataFrame verkregen waarin alleen de rijen staan waarin de speler niet van positie is gewisseld met de tegenstander, oftewel de dubbele records zijn verwijderd.
+
+Deze applicatie heeft geleid tot de creatie van een nieuw CSV-bestand dat alle benodigde gegevens bevat om het model te trainen.
 
 \section{Voorbereiden data}
 
