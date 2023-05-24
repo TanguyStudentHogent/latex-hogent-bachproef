@@ -31,11 +31,13 @@ Het doel van dit onderzoek is om een model te trainen dat de uitkomst van toekom
 Er zijn verschillende databases die partijen bevatten die aan de gestelde criteria voldoen. Websites en applicaties zoals ChessBase, Chess.com, Lichess en vele anderen bieden de meeste benodigde data voor dit onderzoek. De keuze is echter gevallen op het verkrijgen van data van de officiële FIDE-website, omdat FIDE de belangrijkste coördinator is van professioneel schaken. Bovendien bleek uit de functionaliteit van de FIDE-zoekmachine dat deze kan filteren op grootmeesters, actieve spelers en partijlengte. Deze veelzijdige filteringsopties waren overtuigend genoeg om deze bron te verkiezen.
 
 Voor het verkrijgen van de data waren er drie mogelijke benaderingen:
+
 \begin{itemize}
     \item Het gebruik van een door een internationale FIDE-scheidsrechter ontwikkelde Python-parser \autocite{Larreategi}
     \item Een webscraper van de GitHub-repository van \textcite{Alves2020}
     \item Het ontwikkelen van een eigen API en scraper.
 \end{itemize}
+
 Het oorspronkelijke plan was om eerst te onderzoeken of één van de eerste twee opties haalbaar was voordat werd overwogen om zelf een API te ontwikkelen. Er is gestart met het verkennen van de Python-scraper van Mikel Larreategi. Al snel werd echter een probleem ontdekt. De scraper was oorspronkelijk bedoeld om alleen toernooipartijen op te halen. Daarnaast was de verzamelde informatie niet bruikbaar voor het beoogde doel. Belangrijke spelersgegevens, zoals hun ELO-rating, ontbraken, terwijl overbodige informatie, zoals de betrokken scheidsrechters bij elke partij, wel aanwezig was. Het werd al snel duidelijk dat deze benadering niet geschikt was om te volgen.
 
 Op het eerste gezicht leek de tweede optie niet erg veelbelovend, aangezien de API al geruime tijd geleden was ontwikkeld en mogelijk niet meer up-to-date was. Bovendien was de volledige implementatie in JavaScript en was er geen ingebouwde Python-scraper die met de API kon werken. Nader onderzoek onthulde echter een kleine scraper in de GitHub-repository die profielgegevens kon ophalen van elke geregistreerde speler op de FIDE-website, mits de speler-ID bekend was. De speler-ID is niet gebaseerd op de rating of ranglijst van de speler, maar eerder op het tijdstip van toevoeging aan de database of een willekeurige toewijzing.
@@ -125,4 +127,51 @@ Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er 
 
 \section{Filtering data}
 
-De csv-bestanden
+Er zijn drie csv-bestanden gemaakt vanuit het scraping-process. Één bestand voor elke tijdscategorie (standaard, blitz en rapid). De inhoud van deze csv-bestanden houden alle partijen van grootmeesters die tegen een andere grootmeester gespeeld hebben in. Deze bevatten een aantal kolommen. De kolommen zijn als volgt:
+
+\begin{itemize}
+    \item Datum
+    \item Naam speler
+    \item Naam tegenstander
+    \item w => uitkomst van de partij
+    \item n => som uitkomst van beide spelers
+    \item chg => changerate (zal later op dieper ingegaan worden)
+    \item k => katalysator/factor
+    \item kchg => k vermenigvuligd met chg (elo gain/loss)
+    \item Evenement
+    \item Locatie
+    \item Land van afkomst speler
+    \item Titel speler
+    \item Rating tegenstander
+    \item Land van afkomst tegenstander 
+    \item Titel tegenstander
+    \item Kleur => kleur van speler
+\end{itemize}
+
+Technisch gezien hebben we alle data dat we nodig hebben hier. Echter vertonen er snel drie problemen.
+
+Probleem 1: Er zijn heel wat overbodige kolommen met data dat weinig tot geen meerwaarde brengen. Perfecte voorbeelden hiervan is de kolom 'Titel speler' en 'Titel tegenstander'. De eerder vermelde scrapers die opgebouwd zijn met filters, zorgen ervoor dat er enkel mensen met de titel grootmeester in de dataset zitten. 
+
+Probleem 2: De rating van de tegenstander staat op elke lijn vermeldt. Dit is een dynamisch gegeven want de ELO-rating van elke speler wordt pas geüpdate de dag nadat die persoon zijn of haar partijen heeft gespeeld. Deze traag-veranderde waarde is correct voor elke grootmeester maar het probleem is dat er geen kolom is met de ELO-rating van de speler zelf. Zo is het mogelijk om een vergelijking te doen van skill-niveau tussen de twee spelers.
+
+Probleem 3: Alle partijen staan dubbel in het bestand. Als speler x tegen speler y een partij heeft gespeeld op datum z, dan zal dit ook zo staan in de historiek van speler x. Dezelfde logica is ook toepasbaar voor speler y. Dit wil zeggen dat er een record in het csv-bestand zal zijn waarbij speler y tegen speler x heeft gespeeld op dag z. Dit kan een probleem vormen bij het trainen van een model omdat je dubbele data zal trainen en hiermee de nauwkeurigheid mee kan affecteren. 
+
+Het eerste probleem aanpakken is vrij simpel. De applicatie zal de overbodige kolommen verwijderen. Het moeilijkste aan dit process, is kiezen welke kolommen er weg moeten.
+\begin{lstlisting}[language=Python]
+    import pandas as pd
+    df_games = pd.read_csv(games_file_name)
+    df_games = df_games.drop('k', axis=1)
+    df_games = df_games.drop('chg', axis=1)
+    df_games = df_games.drop('n', axis=1)
+    df_games = df_games.drop('event', axis=1)
+    df_games = df_games.drop('location', axis=1)
+    df_games = df_games.drop('country', axis=1)
+    df_games = df_games.drop('opponent_country', axis=1)
+    df_games = df_games.drop('opponent_title', axis=1)
+    df_games = df_games.drop('player_title', axis=1)
+\end{lstlisting}
+
+De kolom k wordt gedroppt met de reden dat deze kolom dezelfde waarde bevatte voor alle grootmeesters. In het regulatiedocument gemaakt door de \textcite{FIDE2021}, staat de k in als de ontwikkelingscoëfficiënt. Rating-systemen behandelen mensen die een tijd niet meer hebben gespeeld, of nieuw zijn in schaken als 'volatile'. Dit wil zeggen dat hun rating-increment meer wordt beïnvloedt. Het belangrijkste detail aan deze statistiek is dat deze waarde tien is voor alle grootmeesters. Dit komt omdat eenmaal een persoon een ELO-rating van 2400 behaalt, deze factor automatisch naar 10 zakt, ookal zou dit twintig, dertig of veertig zijn. Dit beïnvloedt de ELO-gain en ELO-loss na een match maar is voor onze dataset niet van toepassing en heeft geen effect. Op vlak van schaalbaarheid is dit wel anders, indien later een onderzoek wil gevoerd worden over nationale meesters of FIDE-meesters, dan kan dit wel een invloedsfactor zijn voor het trainen van een model. 
+
+De volgende keuze was moeilijk te maken. De kolom chg en kchg bevatten technisch dezelfde data enkel is het verscil dat de waardes in kchg exact vermenigvuldigd zijn met de factor tien ten op zichte van chg. Doordat dit twee kolommen zijn die dezelfde data bevatten, moet er één wegvallen. De keuze dat chg wegvalt is omdat kchg ook staat als ELO-gain/ELO-loss voor die partij. Maar waarvoor precies staat chg?
+
