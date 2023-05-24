@@ -7,7 +7,6 @@
 
 \section{Plan van aanpak}
 
-
 De meest effectieve benadering voor het uitvoeren van dit onderzoek omvat een reeks stappen. Allereerst wordt de data-acquisitie uitgevoerd om relevante gegevens te verzamelen. Het is van essentieel belang om te bepalen waar de meest geschikte bronnen zijn om de benodigde data te verkrijgen en welke methoden kunnen worden toegepast.
 
 Na het succesvol verzamelen van de data, volgt het proces van datafiltering, waarbij onnodige rijen en kolommen worden verwijderd en de aanwezigheid van bruikbare informatie wordt geëvalueerd.
@@ -24,11 +23,11 @@ Door deze methodische aanpak kan het onderzoek gestructureerd worden uitgevoerd,
 
 \subsection{Data extrusion}
 
-In het kader van deze bachelorproef werd als eerste stap gekeken naar de meest geschikte bron voor het verkrijgen van de benodigde data. Voordat bepaald wordt waar de data kan verkrijgbaar is, is het essentieel om de vraag te stellen: Welke specifieke data is nodig?
+In het kader van deze bachelorproef werd als eerste stap gekeken naar de meest geschikte bron voor het verkrijgen van de benodigde data. Voordat bepaald wordt waar de data verkrijgbaar zijn, is het essentieel om de vraag te stellen: Welke specifieke data zijn nodig?
 
 Het doel van dit onderzoek is om een model te trainen dat de uitkomst van toekomstige schaakpartijen kan voorspellen op basis van gespeelde partijen. Aangezien het onderzoek zich uitsluitend richt op grootmeesters, zijn alleen partijen nodig die gespeeld zijn tussen twee grootmeesters. Bovendien is het belangrijk om te weten welke spelers bij welke partij betrokken waren, welke rating ze op dat moment hadden en met welke kleur ze elk speelden.
 
-Er zijn verschillende databases die partijen bevatten die aan de gestelde criteria voldoen. Websites en applicaties zoals ChessBase, Chess.com, Lichess en vele anderen bieden de meeste benodigde data voor dit onderzoek. De keuze is echter gevallen op het verkrijgen van data van de officiële FIDE-website, omdat FIDE de belangrijkste coördinator is van professioneel schaken. Bovendien bleek uit de functionaliteit van de FIDE-zoekmachine dat deze kan filteren op grootmeesters, actieve spelers en partijlengte. Deze veelzijdige filteringsopties waren overtuigend genoeg om deze bron te verkiezen.
+Er zijn verschillende databases die partijen bevatten die aan de gestelde criteria voldoen. Websites en applicaties zoals ChessBase, Chess.com, Lichess en vele anderen bieden de meeste benodigde data voor dit onderzoek. De keuze is echter gevallen op het verkrijgen van data van de officiële FIDE-website, omdat FIDE de belangrijkste coördinator is van professioneel schaken. Bovendien bleek uit de functionaliteit van de FIDE-zoekmachine dat die kan filteren op grootmeesters, actieve spelers en partijlengte. Deze veelzijdige filteringsopties waren overtuigend genoeg om deze bron te verkiezen.
 
 Voor het verkrijgen van de data waren er drie mogelijke benaderingen:
 
@@ -40,7 +39,9 @@ Voor het verkrijgen van de data waren er drie mogelijke benaderingen:
 
 Het oorspronkelijke plan was om eerst te onderzoeken of één van de eerste twee opties haalbaar was voordat werd overwogen om zelf een API te ontwikkelen. Er is gestart met het verkennen van de Python-scraper van Mikel Larreategi. Al snel werd echter een probleem ontdekt. De scraper was oorspronkelijk bedoeld om alleen toernooipartijen op te halen. Daarnaast was de verzamelde informatie niet bruikbaar voor het beoogde doel. Belangrijke spelersgegevens, zoals hun ELO-rating, ontbraken, terwijl overbodige informatie, zoals de betrokken scheidsrechters bij elke partij, wel aanwezig was. Het werd al snel duidelijk dat deze benadering niet geschikt was om te volgen.
 
-Op het eerste gezicht leek de tweede optie niet erg veelbelovend, aangezien de API al geruime tijd geleden was ontwikkeld en mogelijk niet meer up-to-date was. Bovendien was de volledige implementatie in JavaScript en was er geen ingebouwde Python-scraper die met de API kon werken. Nader onderzoek onthulde echter een kleine scraper in de GitHub-repository die profielgegevens kon ophalen van elke geregistreerde speler op de FIDE-website, mits de speler-ID bekend was. De speler-ID is niet gebaseerd op de rating of ranglijst van de speler, maar eerder op het tijdstip van toevoeging aan de database of een willekeurige toewijzing.
+Op het eerste gezicht leek de tweede optie niet erg veelbelovend, aangezien de API al geruime tijd geleden was ontwikkeld en mogelijk niet meer up-to-date was. Bovendien was de volledige implementatie in JavaScript en was er geen ingebouwde Python-scraper die met de API kon werken. Nader onderzoek onthulde echter een kleine scraper in de GitHub-repository aanwezig te zijn die profielgegevens kon ophalen van elke geregistreerde speler op de FIDE-website, mits de speler-ID bekend was. De speler-ID is niet gebaseerd op de rating of ranglijst van de speler, maar eerder op het tijdstip van toevoeging aan de database of een willekeurige toewijzing.
+
+De bestaande scraper leverde niet alle benodigde data op, maar diende als een nuttige basis om een aangepaste scraper te ontwikkelen. Door gebruik te maken van de reeds bestaande API in de GitHub-repository, kon ik het probleem benaderen door twee oplossingen te combineren. Hierdoor kon ik de ontbrekende data aanvullen en een meer uitgebreide dataset verkrijgen.
 
 Een belangrijk voordeel van deze repository is de MIT-licentie die eraan verbonden is. Deze licentie luidt als volgt: "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so." Het enige vereiste voor het gebruik van de software is het opnemen van de bovenstaande auteursrechtvermelding en toestemmingsverklaring in alle kopieën of substantiële delen van de software.
 
@@ -54,7 +55,7 @@ Deze partijgeschiedenis vormt de basis voor de gewenste dataset. Het verkrijgen 
 
 De API is geïmplementeerd in JavaScript, maar gezien mijn ervaring met die taal, ligt mijn expertise niet bij het ontwikkelen van een scraper in JavaScript. Mijn voorkeur gaat eerder uit naar het gebruik van Python voor dit doeleinde, aangezien ik vertrouwd ben met het schrijven van scrapers in deze programmeertaal.
 
-Het plan is dan ook om de scraper te implementeren in Python, met behulp van de bibliotheek Beautiful Soup 4. Beautiful Soup is een Python-bibliotheek waarmee gegevens rechtstreeks in het UTF-8-formaat kunnen worden geëxtraheerd van een website. Deze keuze biedt mij de mogelijkheid om gebruik te maken van de functionaliteiten en flexibiliteit die Python biedt bij het ontwikkelen van de scraper.\autocite{Richardson}
+Het plan is dan ook om de scraper te implementeren in Python, met behulp van de bibliotheek Beautiful Soup 4. Beautiful Soup is een Python-bibliotheek waarmee gegevens rechtstreeks in het UTF-8-formaat kunnen worden geëxtraheerd van een website. Deze keuze biedt de mogelijkheid aan om gebruik te maken van de functionaliteiten en flexibiliteit die Python heeft bij het ontwikkelen van de scraper.\autocite{Richardson}
 
 \begin{lstlisting}[language=Python]
     import re
@@ -72,7 +73,7 @@ Het plan is dan ook om de scraper te implementeren in Python, met behulp van de 
     fide_ids = [pattern.search(href).group(1) for href in hrefs if pattern.search(href)]
 \end{lstlisting}
 
-Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beautifulsoup. Het starten van dit script zorgt ervoor dat een applicatie opstart dat vraagt aan de gebruiker om te kiezen uit standaard, rapid of blitz (de drie tijdsmodules). Nadat deze keuze is gemaakt, vraagt het programma ook welke filter je wilt kiezen. Dit is filter dat een lijst geeft met alle mogelijke titels waaronder de titel grootmeesteer. De data die je kan ophalen is dus flexibel maar voor dit project's doeleinden, worden enkel de partijen van de grootmeesters opgehaald. Zo zijn alle ID's van alle actieve grootmeesters bemachtigd.
+Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van BeautifulSoup. Het starten van dit script zorgt ervoor dat een applicatie opstart die vraagt aan de gebruiker om te kiezen uit standaard, rapid of blitz (de drie tijdsmodules). Nadat die keuze is gemaakt, vraagt het programma ook welke filter je wilt kiezen. Dit is een filter dat een lijst weergeeft met alle mogelijke titels, waaronder de titel grootmeesteer. De data die kan opgehaald worden is dus flexibel maar voor de doeleinden van dit project, worden enkel de partijen van de grootmeesters opgehaald. Zo zijn alle ID's van alle actieve grootmeesters bemachtigd.
 
 \begin{lstlisting}[language=Python]
     import re
@@ -101,7 +102,7 @@ Hierbij worden alle ID's opgehaald van profielen naar keuze met behulp van beaut
 
 In dit proces worden met behulp van Beautiful Soup alle ID's van geselecteerde profielen opgehaald. Bij het starten van dit script wordt een applicatie geïnitialiseerd, waarin de gebruiker wordt gevraagd om een keuze te maken uit de standaard-, rapid- of blitzmodus (de drie beschikbare tijdsmodules). Nadat deze keuze is gemaakt, wordt de gebruiker ook gevraagd welk filter hij of zij wenst toe te passen.
 
-Deze filter stelt een lijst samen met alle mogelijke titels, waaronder de titel "grootmeester". Het is belangrijk op te merken dat de op te halen data flexibel is. Voor de specifieke doeleinden van dit onderzoek wordt de focus gelegd op het verkrijgen van de ID's van actieve grootmeesters. Hierdoor worden alle ID's van de huidige grootmeesters verzameld, wat van cruciaal belang is voor het onderzoek.\autocite{NumFocus}
+Deze filter stelt een lijst samen met alle mogelijke titels, waaronder de titel "grootmeester". Het is belangrijk op te merken dat de op te halen data flexibel zijn. Voor de specifieke doeleinden van dit onderzoek wordt de focus gelegd op het verkrijgen van de ID's van actieve grootmeesters. Hierdoor worden alle ID's van de huidige grootmeesters verzameld, wat van cruciaal belang is voor het onderzoek.\autocite{NumFocus}
 
 \subsection{Historiek}
 
@@ -123,7 +124,7 @@ Op het eerste gezicht lijkt de tussenstap voor het ophalen van spelergegevens mi
             df.to_csv(f"fide_games_{match.group(1)}_{match.group(2)}_oppfromcsv.csv", index=False)
 \end{lstlisting}
 
-Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er al dan niet moet worden gefilterd op naam. Indien de eindgebruiker ervoor kiest om geen filtering toe te passen tijdens het scrapproces, zal het programma de if-statement doorlopen. Daarentegen, indien de eindgebruiker wel filtering wenst, zal de scraper de else-statement volgen. Deze aanpak stelt ons in staat om meerdere CSV-bestanden te genereren voor verschillende doeleinden. Voor dit specifieke project, is er ervoor gekozen om te filteren op de naam. Dit besluit is genomen omdat er enkel interesse is in partijen waarbij een grootmeester tegen een andere grootmeester speelt.
+Binnen de applicatie krijgt een gebruiker de mogelijkheid om aan te geven of er al dan niet moet worden gefilterd op naam. Indien de eindgebruiker ervoor kiest om geen filtering toe te passen tijdens het scrapproces, zal het programma het if-statement doorlopen. Daarentegen, indien de eindgebruiker wel filtering wenst, zal de scraper het else-statement volgen. Deze aanpak stelt ons in staat om meerdere CSV-bestanden te genereren voor verschillende doeleinden. Voor dit specifieke project, is er ervoor gekozen om te filteren op de naam. Dit besluit is genomen omdat er enkel interesse is in partijen waarbij een grootmeester tegen een andere grootmeester speelt.
 
 \section{Filtering data}
 
@@ -195,10 +196,10 @@ Het tweede probleem kan op een elegante manier worden opgelost met een duidelijk
 
 \begin{lstlisting}[language=Python]
     df_games_rating = df_games[['date','player_name','opponent_name','opponent_rating']]
-    def fail(row):
+    def find_cr(row):
         df_result = df_games_rating[(df_games_rating.date == row.date) & (df_games_rating.player_name == row.opponent_name) & (df_games_rating.opponent_name == row.player_name)]
         return str(df_result.opponent_rating.values[0]) if not df_result.empty else ''
-    df_games['current_rating'] = df_games[['date','player_name','opponent_name','opponent_rating']].apply(fail, axis=1)
+    df_games['current_rating'] = df_games[['date','player_name','opponent_name','opponent_rating']].apply(find_cr, axis=1)
 \end{lstlisting}
 
 Het doel van de code is dat we een nieuwe kolom 'current rating' aanmaken waarbij de rating van de speler kan getoond worden dat die persoon had op die dag tegen zijn tegenstander. Het programma zal de huidige ELO-rating van de speler als 'df result' opslaan. Deze waarde wordt opgehaald door de record te zoeken waarbij de datum gelijk is aan de originele record, en waarbij 'naam speler' en 'naam tegenstander' omgewisseld zijn. Als het programma dan deze record heeft gevonden, zal het de rating van de tegenstander teruggeven (wat gelijk is aan de rating van de speler waarna we het op zoek waren). Dan zal er een nieuwe kolom aangemaakt worden waarbij deze waarde zal aan toegevoegd worden. Het argument axis=1 geeft aan dat de sorteerbewerking moet worden toegepast op elke rij. 
@@ -232,9 +233,13 @@ Bovendien biedt de reeds beschikbare data interessante mogelijkheden voor verder
 
 \subsection{Data opschonen}
 
-Eerst wordt alle data ingelezen met behulp van de library pandas (pd.read). Eenmaal dit gedaan is, wordt gekeken of alle data correct is ingeladen en alle kolommen ook correcte waarden aantonen (data.head()). Een header laten genereren zorgt ervoor dat enkel de eerste paar rijen zien maar niet weten of alle data correct is opgevuld of er waardes ontbreken in de dataset. Ook wordt er best gekeken of alle nuttige data ook onder het juiste datatype vallen. AI modellen kunnen echter niet werken met strings, op uitzondering dat de waardes worden opgedeeld afhankelijke variabele klassen. Dit zal in de volgende fase aan bod komen. Eenmaal alle datatypes in orde blijken te zijn, kan gekeken worden naar de waardes en die dan opvullen, vervangen of verwijderen. 
+Na het inlezen van de dataset en het controleren van de gegevens, is het belangrijk om te zorgen voor de juiste datatypen en het opvullen, vervangen of verwijderen van ontbrekende waarden. Dit kan gedaan worden om de dataset te verfijnen en ervoor te zorgen dat het AI-model goed kan werken met de gegevens.
 
-Voor het volgende voorbeeld van de code, zal het csv-bestand van de standaard tijdscategorie genomen worden maar alle veranderingen aangebracht tot deze dataset kan en is toegepast op de andere twee csv-bestanden van de rapid en blitz records.
+Het is van belang om ervoor te zorgen dat de juiste datatypen worden gebruikt voor elke kolom in de dataset. Dit kan gedaan worden met behulp van de functies en methoden die beschikbaar zijn in de pandas-bibliotheek. Bijvoorbeeld, als een kolom met datums als strings is ingeladen, kan deze worden omgezet naar het datetype 'datetime' om zo beter te werken met tijdsgerelateerde operaties en analyses.
+
+Daarnaast is het belangrijk om ontbrekende waarden in de dataset aan te pakken. Dit kunnen waarden zijn die lege cellen of 'NaN' bevatten. Afhankelijk van de aard van de ontbrekende waarden en het specifieke probleem dat wordt aangepakt, kunnen verschillende methoden worden toegepast, zoals het opvullen van ontbrekende waarden met gemiddelde waarden, het vervangen van ontbrekende waarden door aannames op basis van andere gegevens, of het volledig verwijderen van rijen met ontbrekende waarden.
+
+Voor dit specifieke voorbeeld zullen we ons richten op het csv-bestand dat betrekking heeft op de standaard tijdscategorie. De volgende stappen zullen ook worden toegepast op de andere twee csv-bestanden met betrekking tot de rapid en blitz records.
 
 \begin{lstlisting}[language=Python]
     import pandas as pd                                 # Dataframe
@@ -260,6 +265,140 @@ Voor het volgende voorbeeld van de code, zal het csv-bestand van de standaard ti
     memory usage: 11.3+ MB
 \end{lstlisting}
 
-Zoals gezien kan worden, hebben alle kolommen die getalwaardes bevatten een datatype toegekend van een integer of een float. Dit zorgt ervoor dat er geen datatypes moeten aangepast worden en meteen kunnen overgaan naar de waarden die de kolommen bevatten.
+Het feit dat de kolom 'current rating' meer dan 15.000 null-waarden bevat, is een belangrijk gegeven dat moet worden onderzocht en opgelost. Het ontbreken van deze waarden kan verschillende redenen hebben, zoals technische problemen tijdens het verzamelen van de gegevens of het ontbreken van ratinginformatie voor specifieke spelers op bepaalde momenten.
 
-Snel kan gezien worden dat de 'current rating' meer dan 15.000 null-waarden heeft.
+Als er even teruggekeken kan worden naar de code die ervoor zorgt dat de 'current rating'-kolom wordt aangevuld is er een opmerkelijke lijn aangetroffen. Een if-else statement dat ervoor zorgt dat als een record leeg, er niets teruggegeven wordt. Dit werd gedaan om foutboodschappen te vermijden: 
+
+\begin{lstlisting}[language=Python]
+    # Finding all empty values in the "current_rating" column
+    empty_current_rating = data[data['current_rating'].isnull()]
+    print(empty_current_rating)
+\end{lstlisting}
+
+Het is interessant dat bij het onderzoeken van de lege waarden in de 'current rating'-kolom is opgemerkt dat het probleem niet alleen beperkt is tot oudere records, maar ook recentere spellen betreft. Dit suggereert dat er iets anders aan de hand is dan alleen verloren gegane of ongedocumenteerde gegevens in de loop der tijd.
+
+Bij het bekijken van de code die verantwoordelijk is voor het aanvullen van de 'current rating'-kolom, is er een opvallende regel gevonden. Er wordt een if-else statement gebruikt waarbij als een record leeg is, er niets wordt afgedrukt om foutmeldingen te voorkomen.
+
+\begin{lstlisting}[language=Python]
+    return str(df_result.opponent_rating.values[0]) if not df_result.empty else ''
+\end{lstlisting}
+
+Deze bevinding werpt enkele vragen op over de oorspronkelijke bron van de gegevens en de kwaliteit ervan. Het is mogelijk dat er in de oorspronkelijke gegevensbron lege waarden zijn voor de 'current rating', wat heeft geleid tot de lege waarden in de dataset. Het is belangrijk om de gegevensbron grondig te analyseren en te begrijpen om de oorzaak van de lege waarden nauwkeurig te kunnen vaststellen.
+
+Wat eigenaardig is, is dat de lege waarden in de 'current rating'-kolom niet worden veroorzaakt door een ontbrekende 'opponent rating'-waarde, zoals aanvankelijk gedacht. Na nader onderzoek van het csv-bestand is gebleken dat de zogenaamde 'dubbele' records eigenlijk nooit hebben bestaan en niet zijn gescrapet.
+
+De oorzaak van dit fenomeen lijkt te liggen in het feit dat één van de twee spelers op het moment van de partij nog niet de titel van grootmeester had, wat niet wordt opgenomen in onze dataset. Dit heeft geleid tot het ontbreken van een van de records, waardoor de dubbelganger niet kon worden gedetecteerd.
+
+Om dit probleem in onze dataset aan te pakken, zijn er twee mogelijke oplossingen. Één van die mogelijke oplossingen is het aanvullen van de ontbrekende gegevens om te proberen de lege 'current rating'-waarden van een speler aan te vullen. Dit door te kijken naar andere records waarin die speler heeft gespeeld tegen een andere tegenstander op diezelfde datum. Dit kan helpen om de ontbrekende rating van de speler te achterhalen. Echter, bij nader onderzoek bleek dat het vinden van een geschikte match voor aanvulling moeilijk was, omdat de rating van de speler op die specifieke datum niet beschikbaar was voor elke tegenstander. Bovendien bestond het risico dat deze aanvullende gegevens als uitschieters werden beschouwd tijdens het trainen van het AI-model, omdat ze mogelijk niet consistent waren met de algemene dataset.
+
+Daarom is er gekozen voor de tweede oplossing, namelijk het verwijderen van de records waarin de 'current rating'-waarden leeg zijn. Dit resulteerde in het verlies van 6,7\% van de totale dataset (17.602 records van de 262.458 records) over alle csv-bestanden. Het csv-bestand van de standaard tijdscontrole had de grootste relatieve gegevensverlies, maar behield nog steeds meer dan 170.000 records met consistente gegevens, wat nog steeds een aanzienlijke dataset is om mee te werken.
+
+\begin{lstlisting}[language=Python]
+    # Dropping rows with empty values in the "current_rating" column
+    data = data.dropna(subset=['current_rating'], inplace=False)
+    data.info()
+    ---  ------           --------------   -----  
+    <class 'pandas.core.frame.DataFrame'>
+    Int64Index: 171774 entries, 0 to 185460
+    Data columns (total 8 columns):
+    #   Column           Non-Null Count   Dtype  
+    ---  ------           --------------   -----  
+    0   date             171774 non-null  object 
+    1   player_name      171774 non-null  object 
+    2   opponent_name    171774 non-null  object 
+    3   w                171774 non-null  float64
+    4   k_chg            171774 non-null  float64
+    5   opponent_rating  171774 non-null  int64  
+    6   color            171774 non-null  object 
+    7   current_rating   171774 non-null  float64
+    dtypes: float64(3), int64(1), object(4)
+    memory usage: 11.8+ MB
+\end{lstlisting}
+
+Nu de dataset is opgeschoond en klaar is voor gebruik, kunnen we overgaan tot een kleine analysefase. Hieronder volgen enkele mogelijke analyses die kunnen worden uitgevoerd op de schaakdataset:
+
+Winstpercentages: Bereken het winstpercentage voor de spelers met witte en zwarte stukken. Vergelijk deze percentages om te zien of er een significant verschil is. Dit kan worden gedaan voor elke tijdscontrole (standaard, rapid, blitz) om te kijken of er variaties zijn.
+
+Tijdcontrole-effect: Vergelijk de winstpercentages en gelijkspelpercentages tussen de verschillende tijdscontroles (standaard, rapid, blitz). Analyseer of er significante verschillen zijn en of spelers andere speelstijlen aannemen bij verschillende tijdscontroles.
+
+\section{Data Analyse}
+
+Een belangrijk aspect dat naar voren kwam in de literatuurstudie is de invloed van de kleur van de stukken op de uitkomst van schaakpartijen. Traditioneel wordt aangenomen dat spelen met de witte stukken een voordeel kan opleveren. Nu we de volledige dataset hebben verkregen, biedt dit een uitgelezen kans om te onderzoeken of dit ook daadwerkelijk het geval is.
+
+Het analyseren van de invloed van de kleur op de uitkomst van schaakpartijen kan inzicht geven in eventuele ongelijkheden tussen spelers die met wit spelen en spelers die met zwart spelen. Door het bestuderen van de winstpercentages, verliespercentages en gelijkspelpercentages van beide groepen, kunnen we de mogelijke impact van de kleur op de uitkomst beoordelen.
+
+Een belangrijke stap in dit proces is het berekenen van de winstpercentages voor zowel spelers die met wit spelen als spelers die met zwart spelen. Dit kan worden gedaan door het aantal gewonnen partijen door spelers met wit te delen door het totale aantal gespeelde partijen met wit. Op dezelfde manier kan het winstpercentage voor spelers met zwart worden berekend.
+
+Daarnaast kunnen we de verliespercentages en gelijkspelpercentages op dezelfde manier berekenen om een vollediger beeld te krijgen van de uitkomsten van schaakpartijen, rekening houdend met de kleur van de stukken.
+
+Door deze statistische analyses uit te voeren en de resultaten te visualiseren, kunnen we conclusies trekken over de invloed van de kleur op de uitkomst van schaakpartijen. Het is mogelijk dat we bewijs vinden dat wijst op een significant voordeel voor spelers die met wit spelen, of dat de invloed van de kleur minder uitgesproken is dan verwacht. Deze bevindingen kunnen waardevolle inzichten opleveren en kunnen mogelijk worden gebruikt bij het ontwikkelen van AI-modellen voor schaakspelanalyse en -voorspelling.
+
+\begin{lstlisting}[language=Python]
+    # Filter the rows where color is white and calculate the percentage of different values of w
+    white_w_frequency = data[data['color'] == 'white']['w'].value_counts(normalize=True) * 100
+
+    # Filter the rows where color is black and calculate the percentage of different values of w
+    black_w_frequency = data[data['color'] == 'black']['w'].value_counts(normalize=True) * 100
+
+    # Results
+    white_win_percentage = f"{white_w_frequency.get(1.0, 0):.2f}" 
+    white_tie_percentage = f"{white_w_frequency.get(0.5, 0):.2f}"
+    white_loss_percentage = f"{white_w_frequency.get(0.0, 0):.2f}"
+    black_win_percentage = f"{black_w_frequency.get(1.0, 0):.2f}"
+    black_tie_percentage = f"{black_w_frequency.get(0.5, 0):.2f}"
+    black_loss_percentage = f"{black_w_frequency.get(0.0, 0):.2f}"
+
+    # Display the results
+    print("White winpercentage:", white_win_percentage, "%")
+    print("White tiepercentage:", white_tie_percentage, "%")
+    print("White losspercentage:", white_loss_percentage, "%")
+    print("Black winpercentage:", black_win_percentage, "%")
+    print("Black tiepercentage:", black_tie_percentage, "%")
+    print("Black losspercentage:", black_loss_percentage, "%")
+    ---  ------           --------------   -----  
+    # winpercentages standard timeformat  
+    White winpercentage: 28.70 %
+    White tiepercentage: 53.29 %
+    White losspercentage: 18.00 %
+    Black winpercentage: 18.24 %
+    Black tiepercentage: 53.69 %
+    Black losspercentage: 28.07 %
+    # winpercentages rapid timeformat  
+    White winpercentage: 34.24 %
+    White tiepercentage: 40.21 %
+    White losspercentage: 25.55 %
+    Black winpercentage: 26.30 %
+    Black tiepercentage: 40.92 %
+    Black losspercentage: 32.78 %
+    # winpercentages blitz timeformat 
+    White winpercentage: 39.54 %
+    White tiepercentage: 28.78 %
+    White losspercentage: 31.68 %
+    Black winpercentage: 33.17 %
+    Black tiepercentage: 28.79 %
+    Black losspercentage: 38.03 % 
+\end{lstlisting}
+
+De bevindingen van ons onderzoek bevestigen de conclusies die eerder zijn gepresenteerd in de literatuurstudie. Uit onze analyse blijkt dat spelers die met de witte stukken spelen over het algemeen een winstpercentage hebben dat 6-10\% hoger is dan spelers die met de zwarte stukken spelen. Deze bevinding benadrukt het belang van het "tempo" voordeel dat verbonden is aan het spelen met wit, inclusief de mogelijkheid om de eerste zet te doen in een schaakpartij. 
+
+
+Naast de algemene trend waarbij wit een voordeel heeft ten opzichte van zwart, is het opmerkelijk dat de tijdsduur van een schaakpartij ook invloed heeft op de uitkomst van de wedstrijd. Uit onze analyse blijkt dat naarmate spelers meer tijd krijgen om een partij te spelen, het aantal gelijkspelen toeneemt en het winstpercentage afneemt.
+
+We hebben vastgesteld dat het percentage gelijkspelen met 13\% daalt van standaardtijdcontroles tot rapidtijdcontroles, en vervolgens nog eens met 12\% van rapidtijdcontroles tot blitztijdcontroles. Deze bevinding suggereert dat spelers in snellere tijdsformaten meer risico's nemen en vaker tot een beslissend resultaat proberen te komen, wat resulteert in minder gelijkspelen.
+
+Opvallend genoeg stijgt het winstpercentage voor zowel wit als zwart met ongeveer 6\% in deze snellere tijdsformaten. Dit kan worden verklaard door het feit dat spelers onder tijdsdruk meer kans nemen, waardoor er vaker beslissende fouten worden gemaakt die leiden tot overwinningen voor beide kleuren.
+
+Een plausibele verklaring voor de waargenomen trends is dat het spelen met een snellere tijdcontrole de spelers onder hogere tijdsdruk plaatst. De beperkte bedenktijd dwingt spelers om sneller zetten te doen, waardoor ze mogelijk minder tijd hebben om diepgaand te analyseren en verschillende zetvariaties te overwegen. Dit verhoogt het risico op blunders of het over het hoofd zien van belangrijke positionele overwegingen tijdens de partij.
+
+De hogere tijdsdruk kan leiden tot meer impulsieve beslissingen en minder grondig denkwerk, waardoor spelers mogelijk vatbaarder worden voor fouten. Het is bekend dat zelfs ervaren schakers onder druk soms verkeerde zetten maken of cruciale tactische wendingen missen. Het snellere speeltempo kan dus resulteren in een verhoogde kans op dergelijke fouten, wat op zijn beurt kan bijdragen aan een hoger winstpercentage voor beide kleuren en een lager percentage gelijkspelen.
+
+Een andere factor die van invloed kan zijn op de waargenomen trends is de neiging van spelers om met minder bedenktijd meer 'scherpe' en riskantere openingen te spelen. Deze openingen staan erom bekend dat ze afwijken van de beste zetten volgens de computeranalyse en worden doorgaans als minder solide beschouwd op het hoogste niveau. Echter, wanneer een speler tijdens de partij een variatie over het hoofd ziet, kan dit leiden tot een snelle en beslissende aanval.
+
+Het spelen van dergelijke openingsvarianten met een hoger risico kan resulteren in een groter aantal overwinningen, maar tegelijkertijd ook in een hoger aantal nederlagen. Als een tegenstander goed voorbereid is en zich verweert tegen deze riskantere speelstijl, is de kans groter dat zij de partij winnen in plaats van dat deze in een gelijkspel eindigt.
+
+Deze strategieën kunnen een impact hebben op de resultaten, aangezien spelers weten dat sommige mensen snel onder tijdsdruk terecht komen in snellere tijdscontroles, dat ze dan meer geneigd zijn om deze scherpere openingen te proberen. Dit kan verklaren waarom er een stijging is in het winstpercentage voor beide kleuren, omdat er meer mogelijkheden zijn voor snelle beslissende aanvallen, maar tegelijkertijd ook een daling in het percentage gelijkspelen, omdat de risicovollere speelstijl niet altijd succesvol is.
+
+Het begrijpen van deze dynamiek is van belang bij het ontwikkelen van ons AI-model. We moeten rekening houden met de invloed van tijdsdruk op de spelers en de potentiële impact ervan op de nauwkeurigheid van de voorspellingen. Door factoren zoals tijdscontroles en de bijbehorende tijdsdruk in onze analyse op te nemen, streven we ernaar om een robuust en realistisch model te creëren dat rekening houdt met de verschillende aspecten van schaakpartijen. Daarom zal voor elk tijdsformaat een verschillend model opgebouwd worden om de schaakmatches te voorspellen. 
+
+\section{Modeltraining}
+
